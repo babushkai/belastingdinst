@@ -1,0 +1,49 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next.js
+.next/
+out/
+
+# production
+build/
+dist/
+
+# env files
+.env
+.env.local
+.env.*.local
+
+# certificates - NEVER commit
+*.pem
+*.p12
+*.pfx
+*.key
+*.crt
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# misc
+.DS_Store
+*.tsbuildinfo
+
+# docker volumes
+postgres-data/
+backups/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# drizzle
+drizzle/meta/
+
+# uploads
+public/uploads/
