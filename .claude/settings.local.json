@@ -15,7 +15,11 @@
       "Bash(pnpm add:*)",
       "Bash(chmod +x:*)",
       "Bash(npx next:*)",
-      "Bash(npx:*)"
+      "Bash(npx:*)",
+      "Bash(openssl rand:*)",
+      "Bash(docker compose:*)",
+      "Bash(psql:*)",
+      "Bash(lsof:*)"
     ]
   }
 }
