@@ -2,8 +2,8 @@ import { db } from "@/lib/db";
 import { loginAttempts } from "@/lib/db/schema";
 import { sql, gt, lt, and, eq } from "drizzle-orm";
 
-const MAX_ATTEMPTS = 50;
-const WINDOW_MINUTES = 1;
+const MAX_ATTEMPTS = 5;
+const WINDOW_MINUTES = 15;
 
 export async function checkLoginRateLimit(
   ip: string,
