@@ -36,7 +36,10 @@ export default async function LoginPage({
         password: formData.get("password") as string,
         redirectTo: "/dashboard",
       });
-    } catch {
+    } catch (error) {
+      if ((error as { digest?: string })?.digest?.startsWith("NEXT_REDIRECT")) {
+        throw error;
+      }
       await recordLoginAttempt(ip);
       redirect("/login?error=credentials");
     }
