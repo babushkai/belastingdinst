@@ -58,7 +58,7 @@ export function parseWiseCsv(content: string): ParsedTransaction[] {
         ? merchant || payeeName || "Unknown"
         : payerName || "Unknown";
     const counterpartyIban =
-      idxPayeeAccount !== -1 ? fields[idxPayeeAccount]?.trim() ?? null : null;
+      idxPayeeAccount !== -1 ? fields[idxPayeeAccount]?.trim() || undefined : undefined;
 
     const description =
       idxDescription !== -1 ? fields[idxDescription]?.trim() ?? "" : "";
@@ -80,7 +80,7 @@ export function parseWiseCsv(content: string): ParsedTransaction[] {
       amountCents,
       counterpartyName,
       counterpartyIban,
-      description: fullDescription || null,
+      description: fullDescription || undefined,
       importSource: "wise",
     });
   }
