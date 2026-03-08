@@ -84,21 +84,34 @@ function parseEntry(entry: Record<string, unknown>): ParsedTransaction | null {
 
   // Remittance info
   const rmtInf = firstTx?.RmtInf as Record<string, unknown> | undefined;
+  const addtlNtryInf = entry.AddtlNtryInf as string | undefined;
   const description =
-    (rmtInf?.Ustrd as string) ??
-    (entry.AddtlNtryInf as string) ??
-    "";
+    (rmtInf?.Ustrd as string) ?? addtlNtryInf ?? "";
 
-  // External ID — use AcctSvcrRef or construct from entry data
+  // Extract counterparty from AddtlNtryInf if not found in RltdPties
+  // Wise format: "Card transaction of X.XX EUR issued by <merchant>"
+  //              "Received money from <name> with reference ..."
+  //              "Sent money to <name> with reference ..."
+  let resolvedName = counterpartyName;
+  if (!resolvedName && addtlNtryInf) {
+    const issuedBy = addtlNtryInf.match(/issued by\s+(.+)/i);
+    const receivedFrom = addtlNtryInf.match(/(?:Received|Got) money from\s+(.+?)(?:\s+with reference|$)/i);
+    const sentTo = addtlNtryInf.match(/Sent money to\s+(.+?)(?:\s+with reference|$)/i);
+    resolvedName = issuedBy?.[1]?.trim() ?? receivedFrom?.[1]?.trim() ?? sentTo?.[1]?.trim();
+  }
+
+  // External ID — use AcctSvcrRef, BkTxCd reference, or construct from entry data
   const acctSvcrRef = entry.AcctSvcrRef as string | undefined;
+  const bkTxCd = entry.BkTxCd as Record<string, unknown> | undefined;
+  const prtryRef = (bkTxCd?.Prtry as Record<string, unknown>)?.Cd as string | undefined;
   const externalId =
-    acctSvcrRef ?? `camt-${valueDate}-${Math.abs(amountCents)}-${counterpartyName ?? ""}`;
+    acctSvcrRef ?? (prtryRef ? `camt-${prtryRef}` : `camt-${valueDate}-${Math.abs(amountCents)}-${resolvedName ?? ""}`);
 
   return {
     externalId,
     valueDate,
     amountCents,
-    counterpartyName,
+    counterpartyName: resolvedName,
     counterpartyIban,
     description: typeof description === "string" ? description : String(description),
     importSource: "camt053",
