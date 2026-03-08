@@ -37,15 +37,13 @@ function parseEntry(entry: Record<string, unknown>): ParsedTransaction | null {
   const amt = entry.Amt as Record<string, unknown> | undefined;
   if (!amt) return null;
 
+  const rawAmt = amt["#text"] ?? amt;
   const amountValue =
-    typeof amt["#text"] === "string"
-      ? parseFloat(amt["#text"])
-      : typeof amt === "object" && "value" in (amt as Record<string, unknown>)
-        ? parseFloat(String((amt as Record<string, unknown>).value))
-        : typeof amt === "number"
-          ? amt
-          : parseFloat(String(amt));
+    typeof rawAmt === "number"
+      ? rawAmt
+      : parseFloat(String(rawAmt));
 
+  if (Number.isNaN(amountValue)) return null;
   let amountCents = Math.round(amountValue * 100);
 
   // CdtDbtInd: CRDT = credit, DBIT = debit
@@ -58,6 +56,7 @@ function parseEntry(entry: Record<string, unknown>): ParsedTransaction | null {
   const bookgDt = entry.BookgDt as Record<string, unknown> | undefined;
   const valDt = entry.ValDt as Record<string, unknown> | undefined;
   const valueDate = extractDate(valDt) || extractDate(bookgDt) || "";
+  const executionDate = extractDate(bookgDt) || undefined;
 
   if (!valueDate) return null;
 
@@ -110,6 +109,7 @@ function parseEntry(entry: Record<string, unknown>): ParsedTransaction | null {
   return {
     externalId,
     valueDate,
+    executionDate,
     amountCents,
     counterpartyName: resolvedName,
     counterpartyIban,
