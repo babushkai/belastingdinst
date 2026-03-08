@@ -3,6 +3,7 @@ import { transactions, syncLog } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { parseMT940, parseInfo86 } from "../parsers/mt940";
 import { parseCAMT053 } from "../parsers/camt053";
+import { parseWiseCsv } from "../parsers/wise-csv";
 import type { ParsedTransaction, ImportResult } from "../types";
 
 export async function importBankFile(
@@ -28,6 +29,8 @@ export async function importBankFile(
     }
   } else if (ext.endsWith(".xml")) {
     parsed = parseCAMT053(content);
+  } else if (ext.endsWith(".csv")) {
+    parsed = parseWiseCsv(content);
   } else {
     return { imported: 0, skipped: 0, errors: [`Onbekend bestandsformaat: ${ext}`] };
   }
