@@ -12,24 +12,19 @@ import type {
 
 const WISE_API_BASE = "https://api.wise.com";
 
-function getPrivateKey(): string {
-  // Prefer env var (for cloud deploys), fall back to file path (for local dev)
+function getPrivateKey(): string | null {
   const keyEnv = process.env.WISE_PRIVATE_KEY;
-  if (keyEnv) {
-    return keyEnv.replace(/\\n/g, "\n");
-  }
+  if (keyEnv) return keyEnv.replace(/\\n/g, "\n");
 
   const keyPath = process.env.WISE_PRIVATE_KEY_PATH;
-  if (!keyPath) {
-    throw new Error(
-      "Set WISE_PRIVATE_KEY (PEM content) or WISE_PRIVATE_KEY_PATH (file path)",
-    );
-  }
+  if (!keyPath) return null;
+
   return readFileSync(keyPath, "utf-8");
 }
 
-function signOtt(ott: string): string {
+function signOtt(ott: string): string | null {
   const privateKey = getPrivateKey();
+  if (!privateKey) return null;
   const sign = createSign("SHA256");
   sign.update(ott);
   sign.end();
@@ -73,12 +68,16 @@ async function wiseRequest<T>(
       throw new Error(`Wise API 403 (no SCA token): ${body403}`);
     }
 
-    // Sign the OTT with our private key
     const signature = signOtt(ott);
+    if (!signature) {
+      throw new Error(
+        "Wise API requires SCA but no private key configured. " +
+        "Set WISE_PRIVATE_KEY or WISE_PRIVATE_KEY_PATH, or register in the Wise app marketplace for OAuth.",
+      );
+    }
 
     console.log("[Wise SCA] Retrying with signed OTT:", { ott, signature: signature.slice(0, 20) + "..." });
 
-    // Retry with the signed approval
     res = await fetch(url, {
       headers: {
         ...headers,
