@@ -17,6 +17,7 @@ export const importSourceEnum = pgEnum("import_source", [
   "mt940",
   "camt053",
   "manual",
+  "wise",
 ]);
 
 export const transactions = pgTable(

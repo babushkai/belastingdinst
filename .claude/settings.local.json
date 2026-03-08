@@ -19,7 +19,14 @@
       "Bash(openssl rand:*)",
       "Bash(docker compose:*)",
       "Bash(psql:*)",
-      "Bash(lsof:*)"
+      "Bash(lsof:*)",
+      "Bash(openssl:*)",
+      "WebFetch(domain:docs.wise.com)",
+      "WebFetch(domain:community.n8n.io)",
+      "WebFetch(domain:journal.rjevski.io)",
+      "Read(//Users/dsuke/Projects/dev/belastingdinst/**)",
+      "Bash(bash /tmp/test-wise-ott2.sh)",
+      "Bash(bash /tmp/test-wise-token-info.sh)"
     ]
   }
 }

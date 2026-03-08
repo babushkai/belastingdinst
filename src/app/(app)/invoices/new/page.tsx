@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/lib/i18n";
 
 interface Line {
   description: string;
@@ -12,6 +13,7 @@ interface Line {
 
 export default function NewInvoicePage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [contactId, setContactId] = useState("");
   const [contactSearch, setContactSearch] = useState("");
   const [contacts, setContacts] = useState<
@@ -98,25 +100,25 @@ export default function NewInvoicePage() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="mb-6 text-2xl font-bold">Nieuwe factuur</h1>
+      <h1 className="mb-6 text-2xl font-bold text-surface-900">{t("newInvoice")}</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium">Klant</label>
+          <label className="mb-1.5 block text-sm font-medium text-surface-700">{t("customer")}</label>
           <input
             type="text"
-            placeholder="Zoek relatie..."
+            placeholder={t("searchContactPlaceholder")}
             value={contactSearch}
             onChange={(e) => searchContacts(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
+            className="w-full rounded-lg border border-surface-300 bg-white px-3.5 py-2.5 text-sm text-surface-900 shadow-sm transition-colors placeholder:text-surface-400 hover:border-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
           />
           {contacts.length > 0 && !contactId && (
-            <ul className="mt-1 rounded border bg-white shadow">
+            <ul className="mt-1 rounded-lg border border-surface-200 bg-white shadow-lg">
               {contacts.map((c) => (
                 <li key={c.id}>
                   <button
                     type="button"
-                    className="w-full px-3 py-2 text-left hover:bg-gray-50"
+                    className="w-full px-3.5 py-2.5 text-left text-sm text-surface-700 transition-colors hover:bg-surface-50"
                     onClick={() => {
                       setContactId(c.id);
                       setContactSearch(c.companyName ?? "");
@@ -133,36 +135,36 @@ export default function NewInvoicePage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium">Factuurdatum</label>
+            <label className="mb-1.5 block text-sm font-medium text-surface-700">{t("issueDate")}</label>
             <input
               type="date"
               value={issueDate}
               onChange={(e) => setIssueDate(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="w-full rounded-lg border border-surface-300 bg-white px-3.5 py-2.5 text-sm text-surface-900 shadow-sm transition-colors hover:border-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium">Vervaldatum</label>
+            <label className="mb-1.5 block text-sm font-medium text-surface-700">{t("dueDate")}</label>
             <input
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="w-full rounded-lg border border-surface-300 bg-white px-3.5 py-2.5 text-sm text-surface-900 shadow-sm transition-colors hover:border-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
             />
           </div>
         </div>
 
         <div>
-          <h2 className="mb-2 text-sm font-medium">Regels</h2>
+          <h2 className="mb-2 text-sm font-semibold text-surface-800">{t("lines")}</h2>
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-500">
-                <th className="pb-1">Omschrijving</th>
-                <th className="pb-1 w-20">Aantal</th>
-                <th className="pb-1 w-28">Prijs (cent)</th>
-                <th className="pb-1 w-20">BTW %</th>
-                <th className="pb-1 w-24 text-right">Totaal</th>
+              <tr className="text-left text-xs font-medium uppercase tracking-wider text-surface-500">
+                <th className="pb-1">{t("description")}</th>
+                <th className="pb-1 w-20">{t("quantity")}</th>
+                <th className="pb-1 w-28">{t("unitPriceCents")}</th>
+                <th className="pb-1 w-20">{t("btwPercent")}</th>
+                <th className="pb-1 w-24 text-right">{t("total")}</th>
                 <th className="pb-1 w-8"></th>
               </tr>
             </thead>
@@ -176,7 +178,7 @@ export default function NewInvoicePage() {
                       onChange={(e) =>
                         updateLine(idx, "description", e.target.value)
                       }
-                      className="w-full rounded border px-2 py-1"
+                      className="w-full rounded-lg border border-surface-300 px-2.5 py-1.5 text-sm shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
                       required
                     />
                   </td>
@@ -185,9 +187,9 @@ export default function NewInvoicePage() {
                       type="number"
                       value={line.quantity}
                       onChange={(e) =>
-                        updateLine(idx, "quantity", parseFloat(e.target.value))
+                        updateLine(idx, "quantity", parseFloat(e.target.value) || 0)
                       }
-                      className="w-full rounded border px-2 py-1"
+                      className="w-full rounded-lg border border-surface-300 px-2.5 py-1.5 text-sm shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
                       min={0.01}
                       step={0.01}
                       required
@@ -201,10 +203,10 @@ export default function NewInvoicePage() {
                         updateLine(
                           idx,
                           "unitPriceCents",
-                          parseInt(e.target.value),
+                          parseInt(e.target.value) || 0,
                         )
                       }
-                      className="w-full rounded border px-2 py-1"
+                      className="w-full rounded-lg border border-surface-300 px-2.5 py-1.5 text-sm shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
                       required
                     />
                   </td>
@@ -214,14 +216,14 @@ export default function NewInvoicePage() {
                       onChange={(e) =>
                         updateLine(idx, "btwRate", parseInt(e.target.value))
                       }
-                      className="w-full rounded border px-2 py-1"
+                      className="w-full rounded-lg border border-surface-300 px-2.5 py-1.5 text-sm shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
                     >
                       <option value={21}>21%</option>
                       <option value={9}>9%</option>
                       <option value={0}>0%</option>
                     </select>
                   </td>
-                  <td className="py-1 text-right font-mono">
+                  <td className="py-1 text-right font-mono text-surface-700">
                     {(calcLineTotal(line).total / 100).toFixed(2)}
                   </td>
                   <td className="py-1 text-right">
@@ -229,7 +231,7 @@ export default function NewInvoicePage() {
                       <button
                         type="button"
                         onClick={() => removeLine(idx)}
-                        className="text-red-500"
+                        className="text-red-400 transition-colors hover:text-red-600"
                       >
                         x
                       </button>
@@ -242,27 +244,27 @@ export default function NewInvoicePage() {
           <button
             type="button"
             onClick={addLine}
-            className="mt-2 text-sm text-blue-600"
+            className="mt-2 text-sm font-medium text-primary-600 hover:text-primary-700"
           >
-            + Regel toevoegen
+            {t("addLine")}
           </button>
         </div>
 
-        <div className="rounded border p-4 text-sm">
-          <div className="flex justify-between">
-            <span>Subtotaal</span>
+        <div className="rounded-xl border border-surface-200 bg-white p-5 text-sm shadow-sm">
+          <div className="flex justify-between text-surface-600">
+            <span>{t("subtotal")}</span>
             <span className="font-mono">
               &euro;{(totals.subtotal / 100).toFixed(2)}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span>BTW</span>
+          <div className="flex justify-between text-surface-600">
+            <span>{t("btw")}</span>
             <span className="font-mono">
               &euro;{(totals.btw / 100).toFixed(2)}
             </span>
           </div>
-          <div className="flex justify-between border-t pt-2 font-bold">
-            <span>Totaal</span>
+          <div className="flex justify-between border-t border-surface-200 pt-2 font-bold text-surface-900">
+            <span>{t("total")}</span>
             <span className="font-mono">
               &euro;{(totals.total / 100).toFixed(2)}
             </span>
@@ -270,11 +272,11 @@ export default function NewInvoicePage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium">Opmerkingen</label>
+          <label className="mb-1.5 block text-sm font-medium text-surface-700">{t("notes")}</label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
+            className="w-full rounded-lg border border-surface-300 bg-white px-3.5 py-2.5 text-sm text-surface-900 shadow-sm transition-colors placeholder:text-surface-400 hover:border-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
             rows={3}
           />
         </div>
@@ -282,13 +284,13 @@ export default function NewInvoicePage() {
         <div className="flex gap-3">
           <button
             type="submit"
-            disabled={submitting || !contactId}
-            className="rounded bg-black px-4 py-2 text-sm text-white hover:bg-gray-800 disabled:opacity-50"
+            disabled={submitting}
+            className="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-primary-600/25 transition-all hover:bg-primary-700 hover:shadow-lg disabled:opacity-50"
           >
-            Factuur aanmaken
+            {t("createInvoice")}
           </button>
-          <a href="/invoices" className="rounded border px-4 py-2 text-sm">
-            Annuleren
+          <a href="/invoices" className="inline-flex items-center rounded-lg border border-surface-300 bg-white px-5 py-2.5 text-sm font-medium text-surface-700 shadow-sm transition-colors hover:bg-surface-50">
+            {t("cancel")}
           </a>
         </div>
       </form>

@@ -13,6 +13,8 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN mkdir -p public
 RUN pnpm build
+# Compile migration script for production (no tsx needed at runtime)
+RUN npx esbuild src/lib/db/migrate.ts --bundle --platform=node --outfile=dist/migrate.js --external:postgres --external:dotenv
 
 FROM base AS runner
 WORKDIR /app
@@ -27,7 +29,7 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/drizzle ./drizzle
 COPY --from=builder /app/scripts ./scripts
-COPY --from=builder /app/src/lib/db/migrate.ts ./src/lib/db/migrate.ts
+COPY --from=builder /app/dist/migrate.js ./dist/migrate.js
 COPY --from=builder /app/node_modules/dotenv ./node_modules/dotenv
 COPY --from=builder /app/node_modules/drizzle-orm ./node_modules/drizzle-orm
 
@@ -36,4 +38,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "node dist/migrate.js && node server.js"]

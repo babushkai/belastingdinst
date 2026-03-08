@@ -1,20 +1,54 @@
 @import "tailwindcss";
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+  --color-primary-50: oklch(0.97 0.014 264);
+  --color-primary-100: oklch(0.94 0.028 264);
+  --color-primary-200: oklch(0.87 0.056 264);
+  --color-primary-300: oklch(0.78 0.084 264);
+  --color-primary-400: oklch(0.67 0.112 264);
+  --color-primary-500: oklch(0.59 0.14 264);
+  --color-primary-600: oklch(0.52 0.14 264);
+  --color-primary-700: oklch(0.46 0.12 264);
+  --color-primary-800: oklch(0.39 0.1 264);
+  --color-primary-900: oklch(0.33 0.08 264);
+  --color-primary-950: oklch(0.24 0.06 264);
+
+  --color-surface-50: oklch(0.985 0.002 264);
+  --color-surface-100: oklch(0.968 0.004 264);
+  --color-surface-200: oklch(0.928 0.006 264);
+  --color-surface-300: oklch(0.869 0.01 264);
+  --color-surface-400: oklch(0.704 0.015 264);
+  --color-surface-500: oklch(0.554 0.02 264);
+  --color-surface-600: oklch(0.446 0.02 264);
+  --color-surface-700: oklch(0.372 0.017 264);
+  --color-surface-800: oklch(0.279 0.014 264);
+  --color-surface-900: oklch(0.208 0.012 264);
+  --color-surface-950: oklch(0.13 0.01 264);
 }
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Base styles */
+body {
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Smooth focus rings */
+*:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Better scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.7 0.01 264);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.55 0.015 264);
 }

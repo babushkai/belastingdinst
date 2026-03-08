@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { invoices, btwPeriods, syncLog } from "@/lib/db/schema";
 import { eq, sql, desc } from "drizzle-orm";
+import { DashboardContent } from "@/components/DashboardContent";
 
 export default async function DashboardPage() {
   const [openInvoices] = await db
@@ -26,50 +27,20 @@ export default async function DashboardPage() {
     .limit(1);
 
   return (
-    <div>
-      <h1 className="mb-6 text-2xl font-bold">Dashboard</h1>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="rounded-lg border p-4">
-          <h2 className="text-sm text-gray-500">Openstaande facturen</h2>
-          <p className="text-2xl font-bold">
-            {openInvoices?.count ?? 0}
-          </p>
-        </div>
-        <div className="rounded-lg border p-4">
-          <h2 className="text-sm text-gray-500">BTW periode</h2>
-          <p className="text-2xl font-bold">
-            {currentBtw
-              ? `Q${currentBtw.periodNumber} ${currentBtw.year}`
-              : "Geen"}
-          </p>
-          <p className="text-sm text-gray-500">
-            {currentBtw?.status ?? ""}
-          </p>
-        </div>
-        <div className="rounded-lg border p-4">
-          <h2 className="text-sm text-gray-500">Laatste bank sync</h2>
-          <p className="text-sm">
-            {lastSync?.startedAt
-              ? lastSync.startedAt.toLocaleDateString("nl-NL")
-              : "Nog niet gesynchroniseerd"}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-8 flex gap-3">
-        <a
-          href="/invoices/new"
-          className="rounded bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
-        >
-          Nieuwe factuur
-        </a>
-        <a
-          href="/bank/import"
-          className="rounded border px-4 py-2 text-sm hover:bg-gray-50"
-        >
-          Bank import
-        </a>
-      </div>
-    </div>
+    <DashboardContent
+      data={{
+        openCount: openInvoices?.count ?? 0,
+        currentBtw: currentBtw
+          ? {
+              periodNumber: currentBtw.periodNumber,
+              year: currentBtw.year,
+              status: currentBtw.status,
+            }
+          : null,
+        lastSyncDate: lastSync?.startedAt
+          ? lastSync.startedAt.toLocaleDateString("nl-NL")
+          : null,
+      }}
+    />
   );
 }
