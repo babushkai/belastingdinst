@@ -42,8 +42,7 @@ backups/
 *.swp
 *.swo
 
-# drizzle
-drizzle/meta/
+# drizzle (keep meta/ — required for production migrations)
 
 # uploads
 public/uploads/
