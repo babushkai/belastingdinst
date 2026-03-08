@@ -132,20 +132,60 @@ function parseDate(yymmdd: string): string {
 
 /**
  * Extract counterparty info from :86: structured data.
- * Dutch banks use /NAME/ /IBAN/ /REMI/ tags in :86: fields.
+ *
+ * Supports:
+ * - Dutch bank format: /NAME/ /IBAN/ /REMI/ tags
+ * - Wise format: counterparty name as first line, /CHGS/ /EXCH/ tags
+ * - Generic: IBAN detection anywhere in text
  */
 export function parseInfo86(text: string): {
   counterpartyName?: string;
   counterpartyIban?: string;
   description: string;
 } {
+  // Dutch bank format: /NAME/ /IBAN/ /REMI/
   const nameMatch = text.match(/\/NAME\/([^/]+)/);
   const ibanMatch = text.match(/\/IBAN\/([A-Z]{2}\d{2}[A-Z0-9]{4,30})/);
   const remiMatch = text.match(/\/REMI\/([^/]+)/);
 
+  if (nameMatch || ibanMatch || remiMatch) {
+    return {
+      counterpartyName: nameMatch?.[1]?.trim(),
+      counterpartyIban: ibanMatch?.[1]?.trim(),
+      description: remiMatch?.[1]?.trim() ?? text,
+    };
+  }
+
+  // Wise / generic format: strip known MT940 tags and extract useful info
+  // Remove /CHGS/..., /EXCH/..., /EREF/..., /MARF/... tags
+  const cleanedParts: string[] = [];
+  let counterpartyName: string | undefined;
+  let counterpartyIban: string | undefined;
+
+  const segments = text.split(/\s+/);
+  for (const seg of segments) {
+    // Skip charge/exchange/reference tags
+    if (/^\/(?:CHGS|EXCH|EREF|MARF|PREF|SVWZ|KREF|CREF|IREF)\//.test(seg)) {
+      continue;
+    }
+    // Detect IBAN
+    const ibanInSeg = seg.match(/\b([A-Z]{2}\d{2}[A-Z0-9]{4,30})\b/);
+    if (ibanInSeg) {
+      counterpartyIban = ibanInSeg[1];
+      continue;
+    }
+    cleanedParts.push(seg);
+  }
+
+  // First meaningful text segment is likely the counterparty name
+  const cleaned = cleanedParts.join(" ").trim();
+  if (cleaned.length > 0 && !/^[\d,./]+$/.test(cleaned)) {
+    counterpartyName = cleaned;
+  }
+
   return {
-    counterpartyName: nameMatch?.[1]?.trim(),
-    counterpartyIban: ibanMatch?.[1]?.trim(),
-    description: remiMatch?.[1]?.trim() ?? text,
+    counterpartyName,
+    counterpartyIban,
+    description: cleaned || text,
   };
 }
