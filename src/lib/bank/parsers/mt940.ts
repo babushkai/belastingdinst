@@ -18,9 +18,10 @@ export function parseMT940(content: string): ParsedTransaction[] {
   const transactions: ParsedTransaction[] = [];
   const lines = content.split(/\r?\n/);
 
-  let currentTransaction: Partial<ParsedTransaction> | null = null;
+  let currentTransaction: (Partial<ParsedTransaction> & { _ref?: string }) | null = null;
   let infoLines: string[] = [];
   let statementCounter = 0;
+  let expectRefLine = false;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -29,16 +30,26 @@ export function parseMT940(content: string): ParsedTransaction[] {
     if (line.startsWith(":61:")) {
       // Flush previous transaction
       if (currentTransaction?.externalId) {
-        currentTransaction.description = infoLines.join(" ").trim();
-        transactions.push(currentTransaction as ParsedTransaction);
+        flushTransaction(currentTransaction, infoLines, transactions);
       }
 
       const data = line.substring(4);
       currentTransaction = parseStatementLine(data, ++statementCounter);
       infoLines = [];
+      expectRefLine = true;
+    }
+    // :61: continuation line (reference like TRANSFER-xxx, CARD-xxx, BALANCE-xxx)
+    else if (expectRefLine && currentTransaction && !line.startsWith(":")) {
+      currentTransaction._ref = line.trim();
+      // Use Wise reference as a more stable externalId
+      if (currentTransaction._ref) {
+        currentTransaction.externalId = `mt940-${currentTransaction._ref}`;
+      }
+      expectRefLine = false;
     }
     // :86: Information to Account Owner
     else if (line.startsWith(":86:")) {
+      expectRefLine = false;
       infoLines.push(line.substring(4));
     }
     // Continuation of :86: (lines not starting with :XX:)
@@ -52,21 +63,35 @@ export function parseMT940(content: string): ParsedTransaction[] {
     // :62F: or :62M: Closing balance — flush last transaction
     else if (line.startsWith(":62F:") || line.startsWith(":62M:")) {
       if (currentTransaction?.externalId) {
-        currentTransaction.description = infoLines.join(" ").trim();
-        transactions.push(currentTransaction as ParsedTransaction);
+        flushTransaction(currentTransaction, infoLines, transactions);
         currentTransaction = null;
         infoLines = [];
       }
+      expectRefLine = false;
+    } else {
+      expectRefLine = false;
     }
   }
 
   // Flush any remaining transaction
   if (currentTransaction?.externalId) {
-    currentTransaction.description = infoLines.join(" ").trim();
-    transactions.push(currentTransaction as ParsedTransaction);
+    flushTransaction(currentTransaction, infoLines, transactions);
   }
 
   return transactions;
+}
+
+function flushTransaction(
+  tx: Partial<ParsedTransaction> & { _ref?: string },
+  infoLines: string[],
+  out: ParsedTransaction[],
+) {
+  const info86 = infoLines.join(" ").trim();
+  // Build description: combine reference + :86: info
+  const parts = [tx._ref, info86].filter(Boolean);
+  tx.description = parts.join(" — ") || undefined;
+  delete tx._ref;
+  out.push(tx as ParsedTransaction);
 }
 
 function parseStatementLine(

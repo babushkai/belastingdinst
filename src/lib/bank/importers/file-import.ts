@@ -22,8 +22,8 @@ export async function importBankFile(
     for (const tx of parsed) {
       if (tx.description) {
         const info = parseInfo86(tx.description);
-        tx.counterpartyName = info.counterpartyName;
-        tx.counterpartyIban = info.counterpartyIban;
+        if (info.counterpartyName) tx.counterpartyName = info.counterpartyName;
+        if (info.counterpartyIban) tx.counterpartyIban = info.counterpartyIban;
         tx.description = info.description;
       }
     }
