@@ -1,6 +1,8 @@
 "use client";
 
 import { useI18n } from "@/lib/i18n";
+import { Field } from "@/components/ui/Field";
+import { Button, LinkButton } from "@/components/ui/Button";
 
 interface ContactFormProps {
   title: "newContact" | "editContact";
@@ -71,51 +73,13 @@ export function ContactForm({ title, action, defaults = {} }: ContactFormProps) 
           </div>
 
           <div className="flex gap-3 border-t border-surface-100 pt-5">
-            <button
-              type="submit"
-              className="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-primary-600/25 transition-all hover:bg-primary-700 hover:shadow-lg"
-            >
-              {t("save")}
-            </button>
-            <a
-              href="/contacts"
-              className="inline-flex items-center rounded-lg border border-surface-300 bg-white px-5 py-2.5 text-sm font-medium text-surface-700 shadow-sm transition-colors hover:bg-surface-50"
-            >
+            <Button type="submit">{t("save")}</Button>
+            <LinkButton href="/contacts" variant="secondary">
               {t("cancel")}
-            </a>
+            </LinkButton>
           </div>
         </form>
       </div>
-    </div>
-  );
-}
-
-function Field({
-  name,
-  label,
-  type = "text",
-  required = false,
-  defaultValue = "",
-}: {
-  name: string;
-  label: string;
-  type?: string;
-  required?: boolean;
-  defaultValue?: string;
-}) {
-  return (
-    <div>
-      <label htmlFor={name} className="mb-1.5 block text-sm font-medium text-surface-700">
-        {label}
-      </label>
-      <input
-        id={name}
-        name={name}
-        type={type}
-        required={required}
-        defaultValue={defaultValue}
-        className="w-full rounded-lg border border-surface-300 bg-white px-3.5 py-2.5 text-sm text-surface-900 shadow-sm transition-colors placeholder:text-surface-400 hover:border-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
-      />
     </div>
   );
 }

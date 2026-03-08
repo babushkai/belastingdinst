@@ -1,6 +1,9 @@
 "use client";
 
+import { useTransition } from "react";
 import { useI18n } from "@/lib/i18n";
+import { Field, inputClass } from "@/components/ui/Field";
+import { Button } from "@/components/ui/Button";
 
 interface SettingsData {
   companyName: string;
@@ -23,12 +26,16 @@ export function SettingsContent({
   saveAction: (formData: FormData) => Promise<void>;
 }) {
   const { t } = useI18n();
+  const [pending, startTransition] = useTransition();
 
   return (
     <div className="max-w-lg">
       <h1 className="mb-6 text-2xl font-bold text-surface-900">{t("settings")}</h1>
       <div className="rounded-xl border border-surface-200 bg-white p-6 shadow-sm">
-        <form action={saveAction} className="space-y-5">
+        <form
+          action={(formData) => startTransition(() => saveAction(formData))}
+          className="space-y-5"
+        >
           <Field
             name="companyName"
             label={t("companyName")}
@@ -76,7 +83,7 @@ export function SettingsContent({
             <select
               name="defaultBtwRate"
               defaultValue={settings.defaultBtwRate}
-              className="w-full rounded-lg border border-surface-300 bg-white px-3.5 py-2.5 text-sm text-surface-900 shadow-sm transition-colors hover:border-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+              className={inputClass}
             >
               <option value={21}>21%</option>
               <option value={9}>9%</option>
@@ -97,42 +104,12 @@ export function SettingsContent({
           </div>
 
           <div className="border-t border-surface-100 pt-5">
-            <button
-              type="submit"
-              className="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-primary-600/25 transition-all hover:bg-primary-700 hover:shadow-lg"
-            >
+            <Button type="submit" loading={pending}>
               {t("save")}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
-    </div>
-  );
-}
-
-function Field({
-  name,
-  label,
-  defaultValue = "",
-  required = false,
-}: {
-  name: string;
-  label: string;
-  defaultValue?: string;
-  required?: boolean;
-}) {
-  return (
-    <div>
-      <label htmlFor={name} className="mb-1.5 block text-sm font-medium text-surface-700">
-        {label}
-      </label>
-      <input
-        id={name}
-        name={name}
-        defaultValue={defaultValue}
-        required={required}
-        className="w-full rounded-lg border border-surface-300 bg-white px-3.5 py-2.5 text-sm text-surface-900 shadow-sm transition-colors placeholder:text-surface-400 hover:border-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
-      />
     </div>
   );
 }

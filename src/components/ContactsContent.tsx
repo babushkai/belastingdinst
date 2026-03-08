@@ -1,7 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { LinkButton } from "@/components/ui/Button";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface Contact {
   id: string;
@@ -19,18 +23,35 @@ export function ContactsContent({
   deleteAction: (id: string) => Promise<void>;
 }) {
   const { t } = useI18n();
+  const [deleteTarget, setDeleteTarget] = useState<Contact | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await deleteAction(deleteTarget.id);
+      setDeleteTarget(null);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Verwijderen mislukt");
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-surface-900">{t("contacts")}</h1>
-        <Link
-          href="/contacts/new"
-          className="inline-flex items-center rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-primary-600/25 transition-all hover:bg-primary-700 hover:shadow-lg"
-        >
-          {t("newContact")}
-        </Link>
-      </div>
+      <PageHeader title={t("contacts")}>
+        <LinkButton href="/contacts/new">{t("newContact")}</LinkButton>
+      </PageHeader>
+
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
 
       <div className="overflow-hidden rounded-xl border border-surface-200 bg-white shadow-sm">
         <table className="w-full">
@@ -57,19 +78,13 @@ export function ContactsContent({
                   >
                     {t("edit")}
                   </Link>
-                  <form
-                    className="inline"
-                    action={async () => {
-                      await deleteAction(contact.id);
-                    }}
+                  <button
+                    type="button"
+                    onClick={() => setDeleteTarget(contact)}
+                    className="text-sm font-medium text-red-500 hover:text-red-600"
                   >
-                    <button
-                      type="submit"
-                      className="text-sm font-medium text-red-500 hover:text-red-600"
-                    >
-                      {t("deleteAction")}
-                    </button>
-                  </form>
+                    {t("deleteAction")}
+                  </button>
                 </td>
               </tr>
             ))}
@@ -83,6 +98,16 @@ export function ContactsContent({
           </tbody>
         </table>
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title={t("deleteAction")}
+        message={`${deleteTarget?.companyName ?? deleteTarget?.contactName ?? "Dit contact"} ${t("deleteAction").toLowerCase()}?`}
+        confirmLabel={t("deleteAction")}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+        loading={deleting}
+      />
     </div>
   );
 }

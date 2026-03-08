@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
-import Link from "next/link";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Button, LinkButton } from "@/components/ui/Button";
+import { inputClass } from "@/components/ui/Field";
 
 interface ImportResult {
   imported?: number;
@@ -20,6 +22,7 @@ export function BankImportForm({
   const [result, setResult] = useState<ImportResult | null>(null);
   const [uploading, setUploading] = useState(false);
   const [bankAccountId, setBankAccountId] = useState(accounts[0]?.id ?? "");
+  const [fileName, setFileName] = useState<string | null>(null);
 
   async function handleUpload(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -48,17 +51,11 @@ export function BankImportForm({
 
   return (
     <div className="max-w-lg">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-surface-900">
-          {t("bankImportTitle")}
-        </h1>
-        <Link
-          href="/bank"
-          className="inline-flex items-center rounded-lg border border-surface-300 bg-white px-4 py-2.5 text-sm font-medium text-surface-700 shadow-sm transition-colors hover:bg-surface-50"
-        >
+      <PageHeader title={t("bankImportTitle")}>
+        <LinkButton href="/bank" variant="secondary">
           {t("cancel")}
-        </Link>
-      </div>
+        </LinkButton>
+      </PageHeader>
       <p className="mb-4 text-sm text-surface-500">
         {t("bankImportDescription")}
       </p>
@@ -77,7 +74,7 @@ export function BankImportForm({
               <select
                 value={bankAccountId}
                 onChange={(e) => setBankAccountId(e.target.value)}
-                className="w-full rounded-lg border border-surface-300 bg-white px-3.5 py-2.5 text-sm text-surface-900 shadow-sm transition-colors hover:border-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+                className={inputClass}
                 required
               >
                 {accounts.map((acc) => (
@@ -93,22 +90,29 @@ export function BankImportForm({
             <label className="mb-1.5 block text-sm font-medium text-surface-700">
               {t("file")}
             </label>
-            <input
-              type="file"
-              name="file"
-              accept=".sta,.mt940,.swi,.xml,.csv"
-              className="w-full text-sm text-surface-600 file:mr-4 file:rounded-lg file:border-0 file:bg-primary-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-700 hover:file:bg-primary-100"
-              required
-            />
+            <div className="rounded-lg border-2 border-dashed border-surface-300 px-6 py-8 text-center transition-colors hover:border-primary-400">
+              <input
+                type="file"
+                name="file"
+                accept=".sta,.mt940,.swi,.xml,.csv"
+                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                style={{ position: "relative" }}
+                onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
+                required
+              />
+              <p className="text-sm text-surface-500">
+                {fileName ? (
+                  <span className="font-medium text-surface-900">{fileName}</span>
+                ) : (
+                  <>MT940, CAMT.053 (XML), Wise CSV</>
+                )}
+              </p>
+            </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={uploading || accounts.length === 0}
-            className="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-primary-600/25 transition-all hover:bg-primary-700 hover:shadow-lg disabled:opacity-50"
-          >
+          <Button type="submit" loading={uploading} disabled={accounts.length === 0}>
             {uploading ? t("importing") : t("importButton")}
-          </button>
+          </Button>
         </form>
       </div>
 

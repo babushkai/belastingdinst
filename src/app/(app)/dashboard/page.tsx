@@ -8,7 +8,10 @@ export default async function DashboardPage() {
     .select({
       count: sql<number>`count(*)::int`,
       total: sql<number>`coalesce(sum(
-        (select sum(il.unit_price_cents * il.quantity::int) from invoice_lines il where il.invoice_id = invoices.id)
+        (select sum(
+          round(il.unit_price_cents * il.quantity::numeric)
+          + round(round(il.unit_price_cents * il.quantity::numeric) * il.btw_rate / 100)
+        ) from invoice_lines il where il.invoice_id = invoices.id)
       ), 0)::int`,
     })
     .from(invoices)
@@ -30,6 +33,7 @@ export default async function DashboardPage() {
     <DashboardContent
       data={{
         openCount: openInvoices?.count ?? 0,
+        openTotalCents: openInvoices?.total ?? 0,
         currentBtw: currentBtw
           ? {
               periodNumber: currentBtw.periodNumber,
@@ -38,7 +42,7 @@ export default async function DashboardPage() {
             }
           : null,
         lastSyncDate: lastSync?.startedAt
-          ? lastSync.startedAt.toLocaleDateString("nl-NL")
+          ? lastSync.startedAt.toISOString()
           : null,
       }}
     />

@@ -1,7 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { LinkButton } from "@/components/ui/Button";
+import { formatCurrency, formatDate } from "@/lib/format";
 
 interface Transaction {
   id: string;
@@ -21,15 +23,11 @@ export function TransactionsContent({
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-surface-900">{t("transactionsTitle")}</h1>
-        <Link
-          href="/bank/import"
-          className="inline-flex items-center rounded-lg border border-surface-300 bg-white px-4 py-2.5 text-sm font-medium text-surface-700 shadow-sm transition-colors hover:bg-surface-50 hover:text-surface-900"
-        >
+      <PageHeader title={t("transactionsTitle")}>
+        <LinkButton href="/bank/import" variant="secondary">
           {t("importButton")}
-        </Link>
-      </div>
+        </LinkButton>
+      </PageHeader>
 
       <div className="overflow-hidden rounded-xl border border-surface-200 bg-white shadow-sm">
         <table className="w-full text-sm">
@@ -45,15 +43,17 @@ export function TransactionsContent({
           <tbody className="divide-y divide-surface-100">
             {transactions.map((tx) => (
               <tr key={tx.id} className="transition-colors hover:bg-surface-50">
-                <td className="px-5 py-3 font-mono text-xs text-surface-600">{tx.valueDate}</td>
+                <td className="whitespace-nowrap px-5 py-3 text-sm text-surface-600">
+                  {formatDate(tx.valueDate)}
+                </td>
                 <td className="max-w-xs truncate px-5 py-3 text-surface-700">{tx.description}</td>
                 <td className="px-5 py-3 text-surface-700">{tx.counterpartyName ?? "-"}</td>
                 <td
-                  className={`px-5 py-3 text-right font-mono font-medium ${
+                  className={`whitespace-nowrap px-5 py-3 text-right font-mono font-medium ${
                     tx.amountCents < 0 ? "text-red-600" : "text-emerald-600"
                   }`}
                 >
-                  {(tx.amountCents / 100).toFixed(2)}
+                  {formatCurrency(tx.amountCents)}
                 </td>
                 <td className="px-5 py-3 text-xs text-surface-400">
                   {tx.importSource}

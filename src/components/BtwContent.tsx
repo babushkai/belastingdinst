@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import type { TranslationKey } from "@/lib/i18n";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { formatCurrency } from "@/lib/format";
 
 interface BtwPeriod {
   id: string;
@@ -18,10 +22,10 @@ interface BtwPeriod {
   btwTeBetalen: number;
 }
 
-const statusColors: Record<string, string> = {
-  open: "bg-surface-100 text-surface-600",
-  calculated: "bg-primary-50 text-primary-700",
-  filed: "bg-emerald-50 text-emerald-700",
+const statusVariantMap: Record<string, "default" | "primary" | "success"> = {
+  open: "default",
+  calculated: "primary",
+  filed: "success",
 };
 
 const statusKeyMap: Record<string, TranslationKey> = {
@@ -45,32 +49,32 @@ export function BtwContent({
 }) {
   const { t } = useI18n();
   const [error, setError] = useState<string | null>(null);
+  const [calculating, setCalculating] = useState(false);
 
   return (
     <div>
       {error && (
         <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {error}
-          <button type="button" onClick={() => setError(null)} className="ml-3 font-medium text-red-800 hover:text-red-900">✕</button>
+          <button type="button" onClick={() => setError(null)} className="ml-3 font-medium text-red-800 hover:text-red-900">&times;</button>
         </div>
       )}
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-surface-900">{t("btwTitle")}</h1>
+
+      <PageHeader title={t("btwTitle")}>
         <form action={async () => {
+          setCalculating(true);
           const result = await calculateAction();
           if (result.error) setError(result.error);
           else setError(null);
+          setCalculating(false);
         }}>
-          <button
-            type="submit"
-            className="inline-flex items-center rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-primary-600/25 transition-all hover:bg-primary-700 hover:shadow-lg"
-          >
+          <Button type="submit" loading={calculating}>
             {t("calculateQuarter")} Q{currentQuarter} {currentYear}
-          </button>
+          </Button>
         </form>
-      </div>
+      </PageHeader>
 
-      <div className="overflow-hidden rounded-xl border border-surface-200 bg-white shadow-sm">
+      <div className="overflow-x-auto overflow-hidden rounded-xl border border-surface-200 bg-white shadow-sm">
         <table className="w-full">
           <thead>
             <tr className="border-b border-surface-200 bg-surface-50 text-left text-xs font-medium uppercase tracking-wider text-surface-500">
@@ -91,29 +95,27 @@ export function BtwContent({
                   Q{p.periodNumber} {p.year}
                 </td>
                 <td className="px-5 py-3.5">
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[p.status]}`}
-                  >
+                  <Badge variant={statusVariantMap[p.status] ?? "default"}>
                     {statusKeyMap[p.status]
                       ? t(statusKeyMap[p.status])
                       : p.status}
                     {p.locked && ` ${t("locked")}`}
-                  </span>
+                  </Badge>
                 </td>
                 <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
-                  {(p.omzetHoogCents / 100).toFixed(2)}
+                  {formatCurrency(p.omzetHoogCents)}
                 </td>
                 <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
-                  {(p.omzetLaagCents / 100).toFixed(2)}
+                  {formatCurrency(p.omzetLaagCents)}
                 </td>
                 <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
-                  {((p.btwHoogCents + p.btwLaagCents) / 100).toFixed(2)}
+                  {formatCurrency(p.btwHoogCents + p.btwLaagCents)}
                 </td>
                 <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
-                  {(p.btwInkoopCents / 100).toFixed(2)}
+                  {formatCurrency(p.btwInkoopCents)}
                 </td>
                 <td className="px-5 py-3.5 text-right font-mono font-bold text-surface-900">
-                  &euro;{(p.btwTeBetalen / 100).toFixed(2)}
+                  {formatCurrency(p.btwTeBetalen)}
                 </td>
                 <td className="px-5 py-3.5 text-right">
                   {!p.locked && p.status === "calculated" && (
