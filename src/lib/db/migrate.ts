@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config({ path: ".env.local", override: false });
+import fs from "fs";
 import path from "path";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
@@ -11,9 +12,14 @@ async function main() {
   const client = postgres(connectionString, { max: 1 });
   const db = drizzle(client);
 
-  // Resolve from /app working directory — works in both dev and Docker
   const migrationsFolder = path.resolve(process.cwd(), "drizzle");
-  console.log("Running migrations from:", migrationsFolder);
+  const journalPath = path.join(migrationsFolder, "meta", "_journal.json");
+
+  console.log("CWD:", process.cwd());
+  console.log("Migrations folder:", migrationsFolder);
+  console.log("Journal exists:", fs.existsSync(journalPath));
+  console.log("Drizzle dir contents:", fs.existsSync(migrationsFolder) ? fs.readdirSync(migrationsFolder) : "DIR NOT FOUND");
+
   await migrate(db, { migrationsFolder });
   console.log("Migrations complete.");
 
