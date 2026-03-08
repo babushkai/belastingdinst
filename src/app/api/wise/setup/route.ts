@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth/config";
 import { getProfiles, getBalances, saveWiseConfig } from "@/lib/wise/client";
 import { db } from "@/lib/db";
 import { bankAccounts } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -49,11 +49,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Find existing bank account linked to this Wise profile, or create one
+  // Find existing bank account by profileId or IBAN, or create one
+  const wiseIban = `WISE-${businessProfile.id}`;
   const [existing] = await db
     .select({ id: bankAccounts.id })
     .from(bankAccounts)
-    .where(eq(bankAccounts.wiseProfileId, String(businessProfile.id)))
+    .where(
+      or(
+        eq(bankAccounts.wiseProfileId, String(businessProfile.id)),
+        eq(bankAccounts.iban, wiseIban),
+      )!,
+    )
     .limit(1);
 
   let bankAccountId: string;
@@ -64,7 +70,7 @@ export async function POST(req: NextRequest) {
     const [created] = await db
       .insert(bankAccounts)
       .values({
-        iban: `WISE-${businessProfile.id}`,
+        iban: wiseIban,
         bankName: "Wise",
         displayName: `Wise - ${businessProfile.fullName}`,
       })
