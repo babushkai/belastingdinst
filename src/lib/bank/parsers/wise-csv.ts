@@ -47,7 +47,7 @@ export function parseWiseCsv(content: string): ParsedTransaction[] {
 
     const amountCents = Math.round(Number(rawAmount) * 100);
     const dateStr = fields[idxDate]?.trim() ?? "";
-    const valueDate = parseWiseDate(dateStr);
+    const valueDate = formatDate(parseWiseDate(dateStr));
 
     // Determine counterparty: for outgoing use payee/merchant, for incoming use payer
     const payeeName = fields[idxPayeeName]?.trim() ?? "";
@@ -86,6 +86,10 @@ export function parseWiseCsv(content: string): ParsedTransaction[] {
   }
 
   return transactions;
+}
+
+function formatDate(d: Date): string {
+  return d.toISOString().slice(0, 10);
 }
 
 /** Parse DD-MM-YYYY or YYYY-MM-DD date strings */
