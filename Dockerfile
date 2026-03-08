@@ -14,7 +14,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN mkdir -p public
 RUN pnpm build
 # Compile migration script for production (no tsx needed at runtime)
-RUN pnpm exec esbuild src/lib/db/migrate.ts --bundle --platform=node --outfile=dist/migrate.cjs --external:postgres --external:dotenv
+RUN pnpm exec esbuild src/lib/db/migrate.ts --bundle --platform=node --outfile=dist/migrate.cjs --external:postgres --external:dotenv --external:drizzle-orm
 
 FROM base AS runner
 WORKDIR /app
@@ -32,6 +32,7 @@ COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/dist/migrate.cjs ./dist/migrate.cjs
 COPY --from=builder /app/node_modules/dotenv ./node_modules/dotenv
 COPY --from=builder /app/node_modules/drizzle-orm ./node_modules/drizzle-orm
+COPY --from=builder /app/node_modules/postgres ./node_modules/postgres
 
 USER nextjs
 EXPOSE 3000
