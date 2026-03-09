@@ -11,6 +11,7 @@ import {
 import { bankAccounts } from "./bank-accounts";
 import { contacts } from "./contacts";
 import { invoices } from "./invoices";
+import { btwInferenceRules } from "./btw-inference-rules";
 
 export const importSourceEnum = pgEnum("import_source", [
   "ponto",
@@ -39,6 +40,8 @@ export const transactions = pgTable(
     invoiceId: uuid("invoice_id").references(() => invoices.id),
     btwCode: text("btw_code"),
     btwCodeSource: text("btw_code_source"),
+    btwCodeSuggested: text("btw_code_suggested"),
+    inferenceRuleId: uuid("inference_rule_id").references(() => btwInferenceRules.id),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (table) => [

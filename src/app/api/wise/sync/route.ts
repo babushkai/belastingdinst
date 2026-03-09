@@ -11,7 +11,7 @@ const syncSchema = z.object({
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
     bankAccountId,
     new Date(intervalStart),
     new Date(intervalEnd),
+    session.user.id,
   );
 
   return NextResponse.json(result);

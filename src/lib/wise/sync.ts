@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { bankAccounts, transactions, syncLog } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getStatement, loadWiseToken } from "./client";
-import { inferBtwCode } from "@/lib/bank/btw-inference";
+import { loadAllInferenceRules, applyLearnedRuleSync } from "@/lib/bank/btw-inference-rules";
 import type { WiseTransaction } from "./types";
 import type { ParsedTransaction, ImportResult } from "@/lib/bank/types";
 
@@ -33,6 +33,7 @@ export async function syncWiseAccount(
   bankAccountId: string,
   intervalStart: Date,
   intervalEnd: Date,
+  userId: string,
 ): Promise<ImportResult> {
   const apiToken = await loadWiseToken(bankAccountId);
   if (!apiToken) {
@@ -83,9 +84,12 @@ export async function syncWiseAccount(
     const ownAccounts = await db.select({ iban: bankAccounts.iban }).from(bankAccounts);
     const ownIbans = new Set(ownAccounts.map((a) => a.iban.toUpperCase()));
 
+    // Pre-fetch learned rules
+    const rulesMap = await loadAllInferenceRules(userId);
+
     for (const tx of parsed) {
       try {
-        const inferred = inferBtwCode(tx, ownIbans);
+        const inferred = applyLearnedRuleSync(tx, ownIbans, rulesMap);
         const result = await db
           .insert(transactions)
           .values({
@@ -100,6 +104,8 @@ export async function syncWiseAccount(
             importSource: "wise",
             btwCode: inferred.btwCode,
             btwCodeSource: inferred.btwCodeSource,
+            btwCodeSuggested: inferred.btwCodeSuggested,
+            inferenceRuleId: inferred.inferenceRuleId,
           })
           .onConflictDoNothing({
             target: [transactions.bankAccountId, transactions.externalId],

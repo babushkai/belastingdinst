@@ -17,23 +17,27 @@ describe("inferBtwCode", () => {
     const result = inferBtwCode(makeTx({ amountCents: 10000 }));
     expect(result.btwCode).toBeNull();
     expect(result.btwCodeSource).toBeNull();
+    expect(result.btwCodeSuggested).toBeNull();
   });
 
   it("returns null for zero amount", () => {
     const result = inferBtwCode(makeTx({ amountCents: 0 }));
     expect(result.btwCode).toBeNull();
+    expect(result.btwCodeSource).toBeNull();
   });
 
-  it("returns null for unknown debit with no description", () => {
+  it("returns assumed 21% for debit with no description", () => {
     const result = inferBtwCode(makeTx());
     expect(result.btwCode).toBeNull();
-    expect(result.btwCodeSource).toBeNull();
+    expect(result.btwCodeSource).toBe("assumed");
+    expect(result.btwCodeSuggested).toBe("21");
   });
 
   it("returns 21% for recognized software vendor", () => {
     const result = inferBtwCode(makeTx({ counterpartyName: "GitHub Inc" }));
     expect(result.btwCode).toBe("21");
     expect(result.btwCodeSource).toBe("auto");
+    expect(result.btwCodeSuggested).toBeNull();
   });
 
   it("returns 9% for supermarket", () => {
@@ -80,18 +84,61 @@ describe("inferBtwCode", () => {
     );
     expect(result.btwCode).toBeNull();
     expect(result.btwCodeSource).toBeNull();
+    expect(result.btwCodeSuggested).toBeNull();
   });
 
-  it("returns null for unknown generic debit", () => {
+  it("returns assumed for unknown generic debit", () => {
     const result = inferBtwCode(makeTx({ description: "Betaling ref 12345" }));
     expect(result.btwCode).toBeNull();
-    expect(result.btwCodeSource).toBeNull();
+    expect(result.btwCodeSource).toBe("assumed");
+    expect(result.btwCodeSuggested).toBe("21");
   });
 
   it("exempt rules take priority over low-rate", () => {
-    // "premie" is exempt; should not match food
     const result = inferBtwCode(makeTx({ description: "Premie zorgverzekering" }));
     expect(result.btwCode).toBeNull();
     expect(result.btwCodeSource).toBe("auto");
+  });
+
+  // New keyword tests
+  it("returns 21% for OpenAI", () => {
+    const result = inferBtwCode(makeTx({ counterpartyName: "OpenAI LLC" }));
+    expect(result.btwCode).toBe("21");
+    expect(result.btwCodeSource).toBe("auto");
+  });
+
+  it("returns 21% for Stripe", () => {
+    const result = inferBtwCode(makeTx({ description: "Stripe payments fee" }));
+    expect(result.btwCode).toBe("21");
+  });
+
+  it("returns null for healthcare (huisarts)", () => {
+    const result = inferBtwCode(makeTx({ counterpartyName: "Huisartspraktijk De Vaart" }));
+    expect(result.btwCode).toBeNull();
+    expect(result.btwCodeSource).toBe("auto");
+  });
+
+  it("returns null for mortgage (hypotheek)", () => {
+    const result = inferBtwCode(makeTx({ description: "Hypotheek maandtermijn" }));
+    expect(result.btwCode).toBeNull();
+    expect(result.btwCodeSource).toBe("auto");
+  });
+
+  it("returns 9% for Booking.com", () => {
+    const result = inferBtwCode(makeTx({ description: "Booking.com reservation" }));
+    expect(result.btwCode).toBe("9");
+    expect(result.btwCodeSource).toBe("auto");
+  });
+
+  it("matches NS with word boundary", () => {
+    const result = inferBtwCode(makeTx({ description: "NS treinkaart" }));
+    expect(result.btwCode).toBe("21");
+  });
+
+  it("does not match NS inside other words", () => {
+    const result = inferBtwCode(makeTx({ counterpartyName: "PENSIONS Corp" }));
+    expect(result.btwCode).toBeNull();
+    // Should be assumed, not auto-matched as NS
+    expect(result.btwCodeSource).toBe("assumed");
   });
 });

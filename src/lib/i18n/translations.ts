@@ -224,6 +224,23 @@ export const translations = {
   btwCodeNone: { nl: "—", en: "—" },
   btwCodeAuto: { nl: "Automatisch herkend", en: "Auto-inferred" },
   btwCodeManual: { nl: "Handmatig", en: "Manual" },
+  btwCodeLearned: { nl: "Geleerd van eerdere keuze", en: "Learned from previous choice" },
+  btwCodeLearnedShort: { nl: "geleerd", en: "learned" },
+  btwCodeAssumedTooltip: {
+    nl: "Vermoedelijk 21% — bevestig of corrigeer",
+    en: "Assumed 21% — confirm or correct",
+  },
+  btwReviewLink: { nl: "Bekijk onbeoordeeld", en: "Review unclassified" },
+  btwReviewBanner: {
+    nl: "{count} transacties wachten op BTW-beoordeling",
+    en: "{count} transactions need BTW review",
+  },
+  btwReviewEmpty: {
+    nl: "Alle transacties zijn beoordeeld!",
+    en: "All transactions have been reviewed!",
+  },
+  btwBatchSelected: { nl: "geselecteerd", en: "selected" },
+  btwBatchApply: { nl: "Toepassen", en: "Apply" },
 
   // ── BTW ──
   btwTitle: { nl: "BTW Aangifte", en: "VAT Return" },
