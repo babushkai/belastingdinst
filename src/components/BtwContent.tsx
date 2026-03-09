@@ -38,14 +38,16 @@ export function BtwContent({
   periods,
   currentYear,
   currentQuarter,
+  currentPeriodLocked,
   calculateAction,
   fileAction,
 }: {
   periods: BtwPeriod[];
   currentYear: number;
   currentQuarter: number;
-  calculateAction: () => Promise<{ error?: string }>;
-  fileAction: (periodId: string) => Promise<{ error?: string }>;
+  currentPeriodLocked: boolean;
+  calculateAction: () => Promise<{ error?: string; locked?: true }>;
+  fileAction: (periodId: string) => Promise<{ error?: string; locked?: true }>;
 }) {
   const { t } = useI18n();
   const [error, setError] = useState<string | null>(null);
@@ -61,17 +63,29 @@ export function BtwContent({
       )}
 
       <PageHeader title={t("btwTitle")}>
-        <form action={async () => {
-          setCalculating(true);
-          const result = await calculateAction();
-          if (result.error) setError(result.error);
-          else setError(null);
-          setCalculating(false);
-        }}>
-          <Button type="submit" loading={calculating}>
-            {t("calculateQuarter")} Q{currentQuarter} {currentYear}
-          </Button>
-        </form>
+        <div className="flex items-center gap-3">
+          {currentPeriodLocked && (
+            <Badge variant="success">
+              Q{currentQuarter} {currentYear} {t("locked")}
+            </Badge>
+          )}
+          <form action={async () => {
+            setCalculating(true);
+            const result = await calculateAction();
+            if (result.locked) {
+              setError(null);
+            } else if (result.error) {
+              setError(result.error);
+            } else {
+              setError(null);
+            }
+            setCalculating(false);
+          }}>
+            <Button type="submit" loading={calculating} disabled={currentPeriodLocked}>
+              {t("calculateQuarter")} Q{currentQuarter} {currentYear}
+            </Button>
+          </form>
+        </div>
       </PageHeader>
 
       <div className="overflow-x-auto overflow-hidden rounded-xl border border-surface-200 bg-white shadow-sm">
@@ -123,7 +137,8 @@ export function BtwContent({
                       className="inline"
                       action={async () => {
                         const result = await fileAction(p.id);
-                        if (result.error) setError(result.error);
+                        if (result.locked) setError(null);
+                        else if (result.error) setError(result.error);
                         else setError(null);
                       }}
                     >

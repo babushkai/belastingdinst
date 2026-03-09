@@ -5,6 +5,7 @@ import { btwPeriods } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { calculateBtwPeriod } from "./calculator";
+import { PeriodLockedError } from "./period-guard";
 import { auth } from "@/lib/auth/config";
 
 type PeriodType = "quarterly" | "monthly" | "annual";
@@ -46,7 +47,7 @@ export async function saveBtwPeriod(
 
   if (existing.length > 0) {
     if (existing[0].locked) {
-      throw new Error("BTW-periode is vergrendeld en kan niet worden gewijzigd.");
+      throw new PeriodLockedError();
     }
 
     await db
@@ -84,6 +85,16 @@ export async function saveBtwPeriod(
 
 export async function lockAndFilePeriod(periodId: string) {
   await requireAuth();
+
+  const [existing] = await db
+    .select()
+    .from(btwPeriods)
+    .where(eq(btwPeriods.id, periodId))
+    .limit(1);
+
+  if (!existing) throw new Error("Periode niet gevonden");
+  if (existing.locked) throw new PeriodLockedError();
+
   await db
     .update(btwPeriods)
     .set({
