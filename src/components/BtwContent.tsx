@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { Fragment, useState, useMemo } from "react";
 import { useI18n } from "@/lib/i18n";
 import type { TranslationKey } from "@/lib/i18n";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { PeriodSelector } from "@/components/ui/PeriodSelector";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { BtwFilingCard } from "@/components/BtwFilingCard";
 import { formatCurrency } from "@/lib/format";
 
 interface BtwPeriod {
@@ -17,11 +18,14 @@ interface BtwPeriod {
   locked: boolean;
   omzetHoogCents: number;
   omzetLaagCents: number;
+  omzetNulCents: number;
   btwHoogCents: number;
   btwLaagCents: number;
   btwInkoopCents: number;
   btwTeBetalen: number;
 }
+
+const TABLE_COLS = 8;
 
 const statusVariantMap: Record<string, "default" | "primary" | "success"> = {
   open: "default",
@@ -41,6 +45,8 @@ interface BtwContentProps {
   currentQuarter: number;
   firstYear: number;
   lockedPeriodKeys: string[];
+  btwNumber: string | null;
+  korActive: boolean;
   calculateAction: (
     formData: FormData,
   ) => Promise<{ error?: string; locked?: true }>;
@@ -55,6 +61,8 @@ export function BtwContent({
   currentQuarter,
   firstYear,
   lockedPeriodKeys,
+  btwNumber,
+  korActive,
   calculateAction,
   fileAction,
 }: BtwContentProps) {
@@ -62,6 +70,7 @@ export function BtwContent({
   const [error, setError] = useState<string | null>(null);
   const [calculating, setCalculating] = useState(false);
   const [filingId, setFilingId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [selectedQuarter, setSelectedQuarter] = useState(currentQuarter);
 
@@ -167,61 +176,90 @@ export function BtwContent({
             </tr>
           </thead>
           <tbody className="divide-y divide-surface-100">
-            {periods.map((p) => (
-              <tr key={p.id} className="transition-colors hover:bg-surface-50">
-                <td className="px-5 py-3.5 font-medium text-surface-900">
-                  Q{p.periodNumber} {p.year}
-                </td>
-                <td className="px-5 py-3.5">
-                  <Badge variant={statusVariantMap[p.status] ?? "default"}>
-                    {statusKeyMap[p.status]
-                      ? t(statusKeyMap[p.status])
-                      : p.status}
-                    {p.locked && ` ${t("locked")}`}
-                  </Badge>
-                </td>
-                <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
-                  {formatCurrency(p.omzetHoogCents)}
-                </td>
-                <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
-                  {formatCurrency(p.omzetLaagCents)}
-                </td>
-                <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
-                  {formatCurrency(p.btwHoogCents + p.btwLaagCents)}
-                </td>
-                <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
-                  {formatCurrency(p.btwInkoopCents)}
-                </td>
-                <td className="px-5 py-3.5 text-right font-mono font-bold text-surface-900">
-                  {formatCurrency(p.btwTeBetalen)}
-                </td>
-                <td className="px-5 py-3.5 text-right">
-                  {!p.locked && p.status === "calculated" && (
-                    <form
-                      className="inline"
-                      action={async () => {
-                        setFilingId(p.id);
-                        setError(null);
-                        const result = await fileAction(p.id);
-                        if (result.error) setError(result.error);
-                        setFilingId(null);
-                      }}
-                    >
-                      <button
-                        type="submit"
-                        disabled={filingId !== null}
-                        className="text-sm font-medium text-primary-600 hover:text-primary-700 disabled:opacity-50"
-                      >
-                        {filingId === p.id ? "..." : t("submit")}
-                      </button>
-                    </form>
+            {periods.map((p) => {
+              const isExpanded = expandedId === p.id;
+              const canExpand = p.status === "calculated" || p.status === "filed";
+
+              return (
+                <Fragment key={p.id}>
+                  <tr
+                    onClick={canExpand ? () => setExpandedId(isExpanded ? null : p.id) : undefined}
+                    className={`transition-colors hover:bg-surface-50 ${canExpand ? "cursor-pointer" : ""} ${isExpanded ? "bg-surface-50" : ""}`}
+                  >
+                    <td className="px-5 py-3.5 font-medium text-surface-900">
+                      Q{p.periodNumber} {p.year}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <Badge variant={statusVariantMap[p.status] ?? "default"}>
+                        {statusKeyMap[p.status]
+                          ? t(statusKeyMap[p.status])
+                          : p.status}
+                        {p.locked && ` ${t("locked")}`}
+                      </Badge>
+                    </td>
+                    <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
+                      {formatCurrency(p.omzetHoogCents)}
+                    </td>
+                    <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
+                      {formatCurrency(p.omzetLaagCents)}
+                    </td>
+                    <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
+                      {formatCurrency(p.btwHoogCents + p.btwLaagCents)}
+                    </td>
+                    <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
+                      {formatCurrency(p.btwInkoopCents)}
+                    </td>
+                    <td className="px-5 py-3.5 text-right font-mono font-bold text-surface-900">
+                      {formatCurrency(p.btwTeBetalen)}
+                    </td>
+                    <td className="px-5 py-3.5 text-right">
+                      {!p.locked && p.status === "calculated" && (
+                        <form
+                          className="inline"
+                          action={async () => {
+                            setFilingId(p.id);
+                            setError(null);
+                            const result = await fileAction(p.id);
+                            if (result.error) setError(result.error);
+                            setFilingId(null);
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            type="submit"
+                            disabled={filingId !== null}
+                            className="text-sm font-medium text-primary-600 hover:text-primary-700 disabled:opacity-50"
+                          >
+                            {filingId === p.id ? "..." : t("submit")}
+                          </button>
+                        </form>
+                      )}
+                      {canExpand && (
+                        <span className="ml-2 text-xs text-surface-400">
+                          {isExpanded ? "▲" : "▼"}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                  {isExpanded && (
+                    <tr key={`${p.id}-card`}>
+                      <td colSpan={TABLE_COLS} className="border-none bg-surface-50 p-0">
+                        <div className="px-5 py-4">
+                          <BtwFilingCard
+                            period={p}
+                            btwNumber={btwNumber}
+                            korActive={korActive}
+                          />
+                        </div>
+                      </td>
+                    </tr>
                   )}
-                </td>
-              </tr>
-            ))}
+                </Fragment>
+              );
+            })}
             {periods.length === 0 && (
               <tr>
-                <td colSpan={8} className="py-12 text-center text-surface-400">
+                <td colSpan={TABLE_COLS} className="py-12 text-center text-surface-400">
                   {t("btwEmpty")}
                 </td>
               </tr>

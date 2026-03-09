@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatCurrency, centsToEuros, eurosToCents, formatDate } from "../format";
+import { formatCurrency, centsToEuros, eurosToCents, centsToWholeEuros, formatDate } from "../format";
 
 describe("formatCurrency", () => {
   it("formats positive cents to EUR", () => {
@@ -39,6 +39,25 @@ describe("centsToEuros / eurosToCents round-trip", () => {
   it("handles Dutch comma-decimal notation", () => {
     expect(eurosToCents("10,50")).toBe(1050);
     expect(eurosToCents("1.234,56")).toBe(123456);
+  });
+});
+
+describe("centsToWholeEuros", () => {
+  it("truncates to whole euros", () => {
+    expect(centsToWholeEuros(4999)).toBe("49");
+  });
+
+  it("handles zero", () => {
+    expect(centsToWholeEuros(0)).toBe("0");
+  });
+
+  it("handles negative amounts as absolute value", () => {
+    expect(centsToWholeEuros(-500)).toBe("5");
+  });
+
+  it("truncates down, not rounds up", () => {
+    expect(centsToWholeEuros(99)).toBe("0");
+    expect(centsToWholeEuros(150)).toBe("1");
   });
 });
 
