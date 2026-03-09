@@ -33,6 +33,11 @@ export function formatDate(dateStr: string): string {
   return dateFormatter.format(date);
 }
 
+/** Whole non-negative euros for Belastingdienst portal (truncates towards zero) */
+export function centsToWholeEuros(cents: number): string {
+  return String(Math.trunc(Math.abs(cents) / 100));
+}
+
 export function formatRelativeDate(dateStr: string): string {
   const now = new Date();
   const date = new Date(dateStr.includes("T") ? dateStr : dateStr + "T00:00:00");

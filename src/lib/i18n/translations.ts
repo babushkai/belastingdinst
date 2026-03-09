@@ -252,6 +252,46 @@ export const translations = {
     nl: 'Na het berekenen van de BTW-aangifte kun je de bedragen overnemen in Mijn Belastingdienst Zakelijk. De "Te betalen" bedrag is het nettobedrag dat je moet afdragen.',
     en: 'After calculating the VAT return, you can transfer the amounts to Mijn Belastingdienst Zakelijk. The "To pay" amount is the net amount you need to remit.',
   },
+  filingCard: { nl: "Aangifteoverzicht", en: "Filing summary" },
+  filingCardSubtitle: {
+    nl: "Kopieer de bedragen naar Mijn Belastingdienst Zakelijk",
+    en: "Copy the amounts to Mijn Belastingdienst Zakelijk",
+  },
+  omzet: { nl: "Omzet", en: "Revenue" },
+  btwAmount: { nl: "BTW", en: "VAT" },
+  copyValue: { nl: "Kopieer", en: "Copy" },
+  copied: { nl: "Gekopieerd!", en: "Copied!" },
+  filingStep1: {
+    nl: "Open Mijn Belastingdienst Zakelijk en kies \"Omzetbelasting\" → \"Aangifte doen\"",
+    en: "Open Mijn Belastingdienst Zakelijk and choose \"Turnover tax\" → \"File return\"",
+  },
+  filingStep2: {
+    nl: "Selecteer het juiste tijdvak",
+    en: "Select the correct filing period",
+  },
+  filingStep3: {
+    nl: "Kopieer de bedragen per rubriek hieronder naar het formulier",
+    en: "Copy the amounts per section below into the form",
+  },
+  filingStep4: {
+    nl: "Na indienen, klik \"Indienen\" hier om de periode te vergrendelen",
+    en: "After filing, click \"Submit\" here to lock the period",
+  },
+  btwNumberLabel: { nl: "BTW-nummer", en: "VAT number" },
+  fiscalPeriodLabel: { nl: "Aangiftetijdvak", en: "Filing period" },
+  korActiveNotice: {
+    nl: "KOR actief — geen BTW verschuldigd dit kwartaal",
+    en: "Small business scheme active — no VAT due this quarter",
+  },
+  btwNumberMissing: {
+    nl: "BTW-nummer niet ingesteld",
+    en: "VAT number not configured",
+  },
+  portalComputes: {
+    nl: "wordt berekend door de portal",
+    en: "computed by the portal",
+  },
+  revenue0: { nl: "Omzet 0%", en: "Revenue 0%" },
 
   // ── Settings ──
   settings: { nl: "Instellingen", en: "Settings" },
