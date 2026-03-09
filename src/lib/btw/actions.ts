@@ -5,54 +5,77 @@ import { btwPeriods } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { calculateBtwPeriod } from "./calculator";
-import { PeriodLockedError } from "./period-guard";
 import { auth } from "@/lib/auth/config";
-
-type PeriodType = "quarterly" | "monthly" | "annual";
+import { validateQuarterlyPeriod } from "./validate";
 
 async function requireAuth() {
   const session = await auth();
   if (!session) throw new Error("Niet ingelogd");
 }
 
-export async function previewBtwPeriod(
-  year: number,
-  periodNumber: number,
-  periodType: PeriodType,
-) {
-  await requireAuth();
-  return calculateBtwPeriod(year, periodNumber, periodType);
-}
-
+/**
+ * Calculate BTW for a given quarter. Reads year/quarter from FormData hidden inputs.
+ */
 export async function saveBtwPeriod(
-  year: number,
-  periodNumber: number,
-  periodType: PeriodType,
-) {
-  await requireAuth();
-  const calc = await calculateBtwPeriod(year, periodNumber, periodType);
+  formData: FormData,
+): Promise<{ error?: string; locked?: true }> {
+  try {
+    await requireAuth();
 
-  // Upsert
-  const existing = await db
-    .select()
-    .from(btwPeriods)
-    .where(
-      and(
-        eq(btwPeriods.year, year),
-        eq(btwPeriods.periodNumber, periodNumber),
-        eq(btwPeriods.periodType, periodType),
-      ),
-    )
-    .limit(1);
+    const year = Number(formData.get("year"));
+    const quarter = Number(formData.get("quarter"));
+    validateQuarterlyPeriod(year, quarter);
 
-  if (existing.length > 0) {
-    if (existing[0].locked) {
-      throw new PeriodLockedError();
-    }
+    const calc = await calculateBtwPeriod(year, quarter, "quarterly");
 
-    await db
-      .update(btwPeriods)
-      .set({
+    // Atomic upsert: try update with locked=false guard first
+    const existing = await db
+      .select({ id: btwPeriods.id, locked: btwPeriods.locked })
+      .from(btwPeriods)
+      .where(
+        and(
+          eq(btwPeriods.year, year),
+          eq(btwPeriods.periodNumber, quarter),
+          eq(btwPeriods.periodType, "quarterly"),
+        ),
+      )
+      .limit(1);
+
+    if (existing.length > 0) {
+      if (existing[0].locked) {
+        return { locked: true };
+      }
+
+      // Conditional update — only if still unlocked (guards against concurrent lock)
+      const updated = await db
+        .update(btwPeriods)
+        .set({
+          omzetHoogCents: calc.omzetHoogCents,
+          omzetLaagCents: calc.omzetLaagCents,
+          omzetNulCents: calc.omzetNulCents,
+          btwHoogCents: calc.btwHoogCents,
+          btwLaagCents: calc.btwLaagCents,
+          btwInkoopCents: calc.btwInkoopCents,
+          btwTeBetalen: calc.btwTeBetalen,
+          status: "calculated",
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(btwPeriods.id, existing[0].id),
+            eq(btwPeriods.locked, false),
+          ),
+        )
+        .returning({ id: btwPeriods.id });
+
+      if (updated.length === 0) {
+        return { locked: true };
+      }
+    } else {
+      await db.insert(btwPeriods).values({
+        year,
+        periodNumber: quarter,
+        periodType: "quarterly",
         omzetHoogCents: calc.omzetHoogCents,
         omzetLaagCents: calc.omzetLaagCents,
         omzetNulCents: calc.omzetNulCents,
@@ -61,49 +84,50 @@ export async function saveBtwPeriod(
         btwInkoopCents: calc.btwInkoopCents,
         btwTeBetalen: calc.btwTeBetalen,
         status: "calculated",
-        updatedAt: new Date(),
-      })
-      .where(eq(btwPeriods.id, existing[0].id));
-  } else {
-    await db.insert(btwPeriods).values({
-      year,
-      periodNumber,
-      periodType,
-      omzetHoogCents: calc.omzetHoogCents,
-      omzetLaagCents: calc.omzetLaagCents,
-      omzetNulCents: calc.omzetNulCents,
-      btwHoogCents: calc.btwHoogCents,
-      btwLaagCents: calc.btwLaagCents,
-      btwInkoopCents: calc.btwInkoopCents,
-      btwTeBetalen: calc.btwTeBetalen,
-      status: "calculated",
-    });
-  }
+      });
+    }
 
-  revalidatePath("/btw");
+    revalidatePath("/btw");
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Unknown error" };
+  }
 }
 
-export async function lockAndFilePeriod(periodId: string) {
-  await requireAuth();
+/**
+ * Lock and file a BTW period. Uses atomic conditional update.
+ */
+export async function lockAndFilePeriod(
+  periodId: string,
+): Promise<{ error?: string; locked?: true }> {
+  try {
+    await requireAuth();
 
-  const [existing] = await db
-    .select()
-    .from(btwPeriods)
-    .where(eq(btwPeriods.id, periodId))
-    .limit(1);
+    // Atomic: only update if not already locked
+    const result = await db
+      .update(btwPeriods)
+      .set({
+        locked: true,
+        status: "filed",
+        filedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(btwPeriods.id, periodId),
+          eq(btwPeriods.locked, false),
+        ),
+      )
+      .returning({ id: btwPeriods.id });
 
-  if (!existing) throw new Error("Periode niet gevonden");
-  if (existing.locked) throw new PeriodLockedError();
+    if (result.length === 0) {
+      // Either not found or already locked
+      return { locked: true };
+    }
 
-  await db
-    .update(btwPeriods)
-    .set({
-      locked: true,
-      status: "filed",
-      filedAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .where(eq(btwPeriods.id, periodId));
-
-  revalidatePath("/btw");
+    revalidatePath("/btw");
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Unknown error" };
+  }
 }

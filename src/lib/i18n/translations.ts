@@ -240,6 +240,13 @@ export const translations = {
     nl: 'Nog geen BTW-periodes. Klik op "Bereken" om te starten.',
     en: 'No VAT periods yet. Click "Calculate" to start.',
   },
+  selectYear: { nl: "Jaar", en: "Year" },
+  selectQuarter: { nl: "Kwartaal", en: "Quarter" },
+  calculate: { nl: "Bereken", en: "Calculate" },
+  futureQuarter: {
+    nl: "Kan geen toekomstig kwartaal berekenen",
+    en: "Cannot calculate a future quarter",
+  },
   manualFiling: { nl: "Handmatig indienen", en: "Manual filing" },
   manualFilingDescription: {
     nl: 'Na het berekenen van de BTW-aangifte kun je de bedragen overnemen in Mijn Belastingdienst Zakelijk. De "Te betalen" bedrag is het nettobedrag dat je moet afdragen.',

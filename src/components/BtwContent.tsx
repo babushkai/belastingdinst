@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useI18n } from "@/lib/i18n";
 import type { TranslationKey } from "@/lib/i18n";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -34,55 +34,131 @@ const statusKeyMap: Record<string, TranslationKey> = {
   filed: "statusFiled",
 };
 
+interface BtwContentProps {
+  periods: BtwPeriod[];
+  currentYear: number;
+  currentQuarter: number;
+  firstYear: number;
+  lockedPeriodKeys: string[];
+  calculateAction: (
+    formData: FormData,
+  ) => Promise<{ error?: string; locked?: true }>;
+  fileAction: (
+    periodId: string,
+  ) => Promise<{ error?: string; locked?: true }>;
+}
+
 export function BtwContent({
   periods,
   currentYear,
   currentQuarter,
-  currentPeriodLocked,
+  firstYear,
+  lockedPeriodKeys,
   calculateAction,
   fileAction,
-}: {
-  periods: BtwPeriod[];
-  currentYear: number;
-  currentQuarter: number;
-  currentPeriodLocked: boolean;
-  calculateAction: () => Promise<{ error?: string; locked?: true }>;
-  fileAction: (periodId: string) => Promise<{ error?: string; locked?: true }>;
-}) {
+}: BtwContentProps) {
   const { t } = useI18n();
   const [error, setError] = useState<string | null>(null);
   const [calculating, setCalculating] = useState(false);
+  const [filingId, setFilingId] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [selectedQuarter, setSelectedQuarter] = useState(currentQuarter);
+
+  const lockedSet = useMemo(() => new Set(lockedPeriodKeys), [lockedPeriodKeys]);
+
+  const isSelectedLocked = lockedSet.has(`${selectedYear}-${selectedQuarter}`);
+  const isFutureQuarter =
+    selectedYear > currentYear ||
+    (selectedYear === currentYear && selectedQuarter > currentQuarter);
+
+  const years = useMemo(() => {
+    const result: number[] = [];
+    for (let y = currentYear; y >= firstYear; y--) {
+      result.push(y);
+    }
+    return result;
+  }, [currentYear, firstYear]);
+
+  const availableQuarters = useMemo(() => {
+    if (selectedYear === currentYear) {
+      return [1, 2, 3, 4].filter((q) => q <= currentQuarter);
+    }
+    return [1, 2, 3, 4];
+  }, [selectedYear, currentYear, currentQuarter]);
+
+  function handleYearChange(year: number) {
+    setSelectedYear(year);
+    if (year === currentYear && selectedQuarter > currentQuarter) {
+      setSelectedQuarter(currentQuarter);
+    }
+  }
 
   return (
     <div>
       {error && (
         <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {error}
-          <button type="button" onClick={() => setError(null)} className="ml-3 font-medium text-red-800 hover:text-red-900">&times;</button>
+          <button
+            type="button"
+            onClick={() => setError(null)}
+            className="ml-3 font-medium text-red-800 hover:text-red-900"
+          >
+            &times;
+          </button>
         </div>
       )}
 
       <PageHeader title={t("btwTitle")}>
         <div className="flex items-center gap-3">
-          {currentPeriodLocked && (
+          {isSelectedLocked && (
             <Badge variant="success">
-              Q{currentQuarter} {currentYear} {t("locked")}
+              Q{selectedQuarter} {selectedYear} {t("locked")}
             </Badge>
           )}
-          <form action={async () => {
-            setCalculating(true);
-            const result = await calculateAction();
-            if (result.locked) {
+
+          <select
+            value={selectedYear}
+            onChange={(e) => handleYearChange(Number(e.target.value))}
+            className="rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm font-medium text-surface-700 shadow-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+          >
+            {years.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedQuarter}
+            onChange={(e) => setSelectedQuarter(Number(e.target.value))}
+            className="rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm font-medium text-surface-700 shadow-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+          >
+            {availableQuarters.map((q) => (
+              <option key={q} value={q}>
+                Q{q}
+              </option>
+            ))}
+          </select>
+
+          <form
+            action={async (formData: FormData) => {
+              setCalculating(true);
               setError(null);
-            } else if (result.error) {
-              setError(result.error);
-            } else {
-              setError(null);
-            }
-            setCalculating(false);
-          }}>
-            <Button type="submit" loading={calculating} disabled={currentPeriodLocked}>
-              {t("calculateQuarter")} Q{currentQuarter} {currentYear}
+              const result = await calculateAction(formData);
+              if (result.error) {
+                setError(result.error);
+              }
+              setCalculating(false);
+            }}
+          >
+            <input type="hidden" name="year" value={selectedYear} />
+            <input type="hidden" name="quarter" value={selectedQuarter} />
+            <Button
+              type="submit"
+              loading={calculating}
+              disabled={isSelectedLocked || isFutureQuarter}
+            >
+              {t("calculate")} Q{selectedQuarter} {selectedYear}
             </Button>
           </form>
         </div>
@@ -136,17 +212,19 @@ export function BtwContent({
                     <form
                       className="inline"
                       action={async () => {
+                        setFilingId(p.id);
+                        setError(null);
                         const result = await fileAction(p.id);
-                        if (result.locked) setError(null);
-                        else if (result.error) setError(result.error);
-                        else setError(null);
+                        if (result.error) setError(result.error);
+                        setFilingId(null);
                       }}
                     >
                       <button
                         type="submit"
-                        className="text-sm font-medium text-primary-600 hover:text-primary-700"
+                        disabled={filingId !== null}
+                        className="text-sm font-medium text-primary-600 hover:text-primary-700 disabled:opacity-50"
                       >
-                        {t("submit")}
+                        {filingId === p.id ? "..." : t("submit")}
                       </button>
                     </form>
                   )}
