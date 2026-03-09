@@ -221,6 +221,9 @@ export const translations = {
     nl: "Nog geen transacties. Importeer een bankbestand.",
     en: "No transactions yet. Import a bank file.",
   },
+  btwCodeNone: { nl: "—", en: "—" },
+  btwCodeAuto: { nl: "Automatisch herkend", en: "Auto-inferred" },
+  btwCodeManual: { nl: "Handmatig", en: "Manual" },
 
   // ── BTW ──
   btwTitle: { nl: "BTW Aangifte", en: "VAT Return" },

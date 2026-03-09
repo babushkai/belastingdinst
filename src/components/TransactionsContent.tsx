@@ -1,9 +1,12 @@
 "use client";
 
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { LinkButton } from "@/components/ui/Button";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { updateTransactionBtwCode } from "@/lib/bank/actions";
 
 interface Transaction {
   id: string;
@@ -12,6 +15,65 @@ interface Transaction {
   counterpartyName: string | null;
   description: string | null;
   importSource: string;
+  btwCode: string | null;
+  btwCodeSource: string | null;
+}
+
+const TABLE_COLS = 6;
+
+function BtwSelect({
+  transactionId,
+  btwCode,
+  btwCodeSource,
+}: {
+  transactionId: string;
+  btwCode: string | null;
+  btwCodeSource: string | null;
+}) {
+  const { t } = useI18n();
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  function handleChange(value: string) {
+    const newCode = value === "" ? null : value;
+    setError(null);
+    startTransition(async () => {
+      const result = await updateTransactionBtwCode(transactionId, newCode);
+      if (result.error) {
+        setError(result.error);
+      }
+      router.refresh();
+    });
+  }
+
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <select
+        value={btwCode ?? ""}
+        onChange={(e) => handleChange(e.target.value)}
+        disabled={isPending}
+        className={`rounded border px-1.5 py-0.5 text-xs font-medium transition-colors ${
+          isPending
+            ? "border-surface-200 bg-surface-100 text-surface-400"
+            : error
+              ? "border-red-300 bg-red-50 text-red-600"
+              : "border-surface-200 bg-white text-surface-700 hover:border-surface-300"
+        }`}
+        title={error ?? undefined}
+      >
+        <option value="">{t("btwCodeNone")}</option>
+        <option value="21">21%</option>
+        <option value="9">9%</option>
+        <option value="0">0%</option>
+      </select>
+      {btwCodeSource === "auto" && !error && (
+        <span className="text-[10px] italic text-surface-400" title={t("btwCodeAuto")}>
+          auto
+        </span>
+      )}
+    </span>
+  );
 }
 
 export function TransactionsContent({
@@ -37,6 +99,7 @@ export function TransactionsContent({
               <th className="px-5 py-3">{t("description")}</th>
               <th className="px-5 py-3">{t("counterparty")}</th>
               <th className="px-5 py-3 text-right">{t("amount")}</th>
+              <th className="px-5 py-3">{t("btw")}</th>
               <th className="px-5 py-3">{t("source")}</th>
             </tr>
           </thead>
@@ -55,6 +118,13 @@ export function TransactionsContent({
                 >
                   {formatCurrency(tx.amountCents)}
                 </td>
+                <td className="px-5 py-3">
+                  <BtwSelect
+                    transactionId={tx.id}
+                    btwCode={tx.btwCode}
+                    btwCodeSource={tx.btwCodeSource}
+                  />
+                </td>
                 <td className="px-5 py-3 text-xs text-surface-400">
                   {tx.importSource}
                 </td>
@@ -62,7 +132,7 @@ export function TransactionsContent({
             ))}
             {transactions.length === 0 && (
               <tr>
-                <td colSpan={5} className="py-12 text-center text-surface-400">
+                <td colSpan={TABLE_COLS} className="py-12 text-center text-surface-400">
                   {t("transactionsEmpty")}
                 </td>
               </tr>

@@ -13,6 +13,7 @@ export default async function TransactionsPage() {
       description: transactions.description,
       importSource: transactions.importSource,
       btwCode: transactions.btwCode,
+      btwCodeSource: transactions.btwCodeSource,
     })
     .from(transactions)
     .orderBy(desc(transactions.valueDate))
@@ -27,6 +28,8 @@ export default async function TransactionsPage() {
         counterpartyName: tx.counterpartyName,
         description: tx.description,
         importSource: tx.importSource,
+        btwCode: tx.btwCode,
+        btwCodeSource: tx.btwCodeSource,
       }))}
     />
   );

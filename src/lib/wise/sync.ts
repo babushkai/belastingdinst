@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { bankAccounts, transactions, syncLog } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getStatement, loadWiseToken } from "./client";
+import { inferBtwCode } from "@/lib/bank/btw-inference";
 import type { WiseTransaction } from "./types";
 import type { ParsedTransaction, ImportResult } from "@/lib/bank/types";
 
@@ -78,8 +79,13 @@ export async function syncWiseAccount(
 
     const parsed = statement.transactions.map(mapWiseTransaction);
 
+    // Own IBANs for self-transfer detection
+    const ownAccounts = await db.select({ iban: bankAccounts.iban }).from(bankAccounts);
+    const ownIbans = new Set(ownAccounts.map((a) => a.iban.toUpperCase()));
+
     for (const tx of parsed) {
       try {
+        const inferred = inferBtwCode(tx, ownIbans);
         const result = await db
           .insert(transactions)
           .values({
@@ -92,6 +98,8 @@ export async function syncWiseAccount(
             counterpartyIban: tx.counterpartyIban ?? null,
             description: tx.description ?? null,
             importSource: "wise",
+            btwCode: inferred.btwCode,
+            btwCodeSource: inferred.btwCodeSource,
           })
           .onConflictDoNothing({
             target: [transactions.bankAccountId, transactions.externalId],
