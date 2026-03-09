@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+.env
+.env.local
+.env.*.local
+postgres-data
+backups
+.DS_Store
