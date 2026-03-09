@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useI18n } from "@/lib/i18n";
 import type { TranslationKey } from "@/lib/i18n";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { PeriodSelector } from "@/components/ui/PeriodSelector";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { formatCurrency } from "@/lib/format";
@@ -108,38 +109,25 @@ export function BtwContent({
         </div>
       )}
 
-      <PageHeader title={t("btwTitle")}>
+      <PageHeader title={t("btwTitle")} />
+
+      <div className="mb-6 flex items-center justify-between">
+        <PeriodSelector
+          years={years}
+          selectedYear={selectedYear}
+          selectedQuarter={selectedQuarter}
+          availableQuarters={availableQuarters}
+          lockedKeys={lockedSet}
+          onYearChange={handleYearChange}
+          onQuarterChange={setSelectedQuarter}
+        />
+
         <div className="flex items-center gap-3">
           {isSelectedLocked && (
-            <Badge variant="success">
+            <span className="text-sm text-emerald-600">
               Q{selectedQuarter} {selectedYear} {t("locked")}
-            </Badge>
+            </span>
           )}
-
-          <select
-            value={selectedYear}
-            onChange={(e) => handleYearChange(Number(e.target.value))}
-            className="rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm font-medium text-surface-700 shadow-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
-          >
-            {years.map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={selectedQuarter}
-            onChange={(e) => setSelectedQuarter(Number(e.target.value))}
-            className="rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm font-medium text-surface-700 shadow-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
-          >
-            {availableQuarters.map((q) => (
-              <option key={q} value={q}>
-                Q{q}
-              </option>
-            ))}
-          </select>
-
           <form
             action={async (formData: FormData) => {
               setCalculating(true);
@@ -162,7 +150,7 @@ export function BtwContent({
             </Button>
           </form>
         </div>
-      </PageHeader>
+      </div>
 
       <div className="overflow-x-auto overflow-hidden rounded-xl border border-surface-200 bg-white shadow-sm">
         <table className="w-full">
