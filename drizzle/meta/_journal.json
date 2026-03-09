@@ -15,6 +15,20 @@
       "when": 1772917326797,
       "tag": "0001_right_black_cat",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773062502904,
+      "tag": "0002_fluffy_slipstream",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1773066585573,
+      "tag": "0003_unknown_vermin",
+      "breakpoints": true
     }
   ]
 }

@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState, useMemo } from "react";
 import { useI18n } from "@/lib/i18n";
 import type { TranslationKey } from "@/lib/i18n";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { PeriodSelector } from "@/components/ui/PeriodSelector";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { BtwFilingCard } from "@/components/BtwFilingCard";
 import { formatCurrency } from "@/lib/format";
 
 interface BtwPeriod {
@@ -16,11 +18,14 @@ interface BtwPeriod {
   locked: boolean;
   omzetHoogCents: number;
   omzetLaagCents: number;
+  omzetNulCents: number;
   btwHoogCents: number;
   btwLaagCents: number;
   btwInkoopCents: number;
   btwTeBetalen: number;
 }
+
+const TABLE_COLS = 8;
 
 const statusVariantMap: Record<string, "default" | "primary" | "success"> = {
   open: "default",
@@ -34,45 +39,127 @@ const statusKeyMap: Record<string, TranslationKey> = {
   filed: "statusFiled",
 };
 
+interface BtwContentProps {
+  periods: BtwPeriod[];
+  currentYear: number;
+  currentQuarter: number;
+  firstYear: number;
+  lockedPeriodKeys: string[];
+  btwNumber: string | null;
+  korActive: boolean;
+  calculateAction: (
+    formData: FormData,
+  ) => Promise<{ error?: string; locked?: true }>;
+  fileAction: (
+    periodId: string,
+  ) => Promise<{ error?: string; locked?: true }>;
+}
+
 export function BtwContent({
   periods,
   currentYear,
   currentQuarter,
+  firstYear,
+  lockedPeriodKeys,
+  btwNumber,
+  korActive,
   calculateAction,
   fileAction,
-}: {
-  periods: BtwPeriod[];
-  currentYear: number;
-  currentQuarter: number;
-  calculateAction: () => Promise<{ error?: string }>;
-  fileAction: (periodId: string) => Promise<{ error?: string }>;
-}) {
+}: BtwContentProps) {
   const { t } = useI18n();
   const [error, setError] = useState<string | null>(null);
   const [calculating, setCalculating] = useState(false);
+  const [filingId, setFilingId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [selectedQuarter, setSelectedQuarter] = useState(currentQuarter);
+
+  const lockedSet = useMemo(() => new Set(lockedPeriodKeys), [lockedPeriodKeys]);
+
+  const isSelectedLocked = lockedSet.has(`${selectedYear}-${selectedQuarter}`);
+  const isFutureQuarter =
+    selectedYear > currentYear ||
+    (selectedYear === currentYear && selectedQuarter > currentQuarter);
+
+  const years = useMemo(() => {
+    const result: number[] = [];
+    for (let y = currentYear; y >= firstYear; y--) {
+      result.push(y);
+    }
+    return result;
+  }, [currentYear, firstYear]);
+
+  const availableQuarters = useMemo(() => {
+    if (selectedYear === currentYear) {
+      return [1, 2, 3, 4].filter((q) => q <= currentQuarter);
+    }
+    return [1, 2, 3, 4];
+  }, [selectedYear, currentYear, currentQuarter]);
+
+  function handleYearChange(year: number) {
+    setSelectedYear(year);
+    if (year === currentYear && selectedQuarter > currentQuarter) {
+      setSelectedQuarter(currentQuarter);
+    }
+  }
 
   return (
     <div>
       {error && (
         <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {error}
-          <button type="button" onClick={() => setError(null)} className="ml-3 font-medium text-red-800 hover:text-red-900">&times;</button>
+          <button
+            type="button"
+            onClick={() => setError(null)}
+            className="ml-3 font-medium text-red-800 hover:text-red-900"
+          >
+            &times;
+          </button>
         </div>
       )}
 
-      <PageHeader title={t("btwTitle")}>
-        <form action={async () => {
-          setCalculating(true);
-          const result = await calculateAction();
-          if (result.error) setError(result.error);
-          else setError(null);
-          setCalculating(false);
-        }}>
-          <Button type="submit" loading={calculating}>
-            {t("calculateQuarter")} Q{currentQuarter} {currentYear}
-          </Button>
-        </form>
-      </PageHeader>
+      <PageHeader title={t("btwTitle")} />
+
+      <div className="mb-6 flex items-center justify-between">
+        <PeriodSelector
+          years={years}
+          selectedYear={selectedYear}
+          selectedQuarter={selectedQuarter}
+          availableQuarters={availableQuarters}
+          lockedKeys={lockedSet}
+          onYearChange={handleYearChange}
+          onQuarterChange={setSelectedQuarter}
+        />
+
+        <div className="flex items-center gap-3">
+          {isSelectedLocked && (
+            <span className="text-sm text-emerald-600">
+              Q{selectedQuarter} {selectedYear} {t("locked")}
+            </span>
+          )}
+          <form
+            action={async (formData: FormData) => {
+              setCalculating(true);
+              setError(null);
+              const result = await calculateAction(formData);
+              if (result.error) {
+                setError(result.error);
+              }
+              setCalculating(false);
+            }}
+          >
+            <input type="hidden" name="year" value={selectedYear} />
+            <input type="hidden" name="quarter" value={selectedQuarter} />
+            <Button
+              type="submit"
+              loading={calculating}
+              disabled={isSelectedLocked || isFutureQuarter}
+            >
+              {t("calculate")} Q{selectedQuarter} {selectedYear}
+            </Button>
+          </form>
+        </div>
+      </div>
 
       <div className="overflow-x-auto overflow-hidden rounded-xl border border-surface-200 bg-white shadow-sm">
         <table className="w-full">
@@ -89,58 +176,90 @@ export function BtwContent({
             </tr>
           </thead>
           <tbody className="divide-y divide-surface-100">
-            {periods.map((p) => (
-              <tr key={p.id} className="transition-colors hover:bg-surface-50">
-                <td className="px-5 py-3.5 font-medium text-surface-900">
-                  Q{p.periodNumber} {p.year}
-                </td>
-                <td className="px-5 py-3.5">
-                  <Badge variant={statusVariantMap[p.status] ?? "default"}>
-                    {statusKeyMap[p.status]
-                      ? t(statusKeyMap[p.status])
-                      : p.status}
-                    {p.locked && ` ${t("locked")}`}
-                  </Badge>
-                </td>
-                <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
-                  {formatCurrency(p.omzetHoogCents)}
-                </td>
-                <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
-                  {formatCurrency(p.omzetLaagCents)}
-                </td>
-                <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
-                  {formatCurrency(p.btwHoogCents + p.btwLaagCents)}
-                </td>
-                <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
-                  {formatCurrency(p.btwInkoopCents)}
-                </td>
-                <td className="px-5 py-3.5 text-right font-mono font-bold text-surface-900">
-                  {formatCurrency(p.btwTeBetalen)}
-                </td>
-                <td className="px-5 py-3.5 text-right">
-                  {!p.locked && p.status === "calculated" && (
-                    <form
-                      className="inline"
-                      action={async () => {
-                        const result = await fileAction(p.id);
-                        if (result.error) setError(result.error);
-                        else setError(null);
-                      }}
-                    >
-                      <button
-                        type="submit"
-                        className="text-sm font-medium text-primary-600 hover:text-primary-700"
-                      >
-                        {t("submit")}
-                      </button>
-                    </form>
+            {periods.map((p) => {
+              const isExpanded = expandedId === p.id;
+              const canExpand = p.status === "calculated" || p.status === "filed";
+
+              return (
+                <Fragment key={p.id}>
+                  <tr
+                    onClick={canExpand ? () => setExpandedId(isExpanded ? null : p.id) : undefined}
+                    className={`transition-colors hover:bg-surface-50 ${canExpand ? "cursor-pointer" : ""} ${isExpanded ? "bg-surface-50" : ""}`}
+                  >
+                    <td className="px-5 py-3.5 font-medium text-surface-900">
+                      Q{p.periodNumber} {p.year}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <Badge variant={statusVariantMap[p.status] ?? "default"}>
+                        {statusKeyMap[p.status]
+                          ? t(statusKeyMap[p.status])
+                          : p.status}
+                        {p.locked && ` ${t("locked")}`}
+                      </Badge>
+                    </td>
+                    <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
+                      {formatCurrency(p.omzetHoogCents)}
+                    </td>
+                    <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
+                      {formatCurrency(p.omzetLaagCents)}
+                    </td>
+                    <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
+                      {formatCurrency(p.btwHoogCents + p.btwLaagCents)}
+                    </td>
+                    <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
+                      {formatCurrency(p.btwInkoopCents)}
+                    </td>
+                    <td className="px-5 py-3.5 text-right font-mono font-bold text-surface-900">
+                      {formatCurrency(p.btwTeBetalen)}
+                    </td>
+                    <td className="px-5 py-3.5 text-right">
+                      {!p.locked && p.status === "calculated" && (
+                        <form
+                          className="inline"
+                          action={async () => {
+                            setFilingId(p.id);
+                            setError(null);
+                            const result = await fileAction(p.id);
+                            if (result.error) setError(result.error);
+                            setFilingId(null);
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            type="submit"
+                            disabled={filingId !== null}
+                            className="text-sm font-medium text-primary-600 hover:text-primary-700 disabled:opacity-50"
+                          >
+                            {filingId === p.id ? "..." : t("submit")}
+                          </button>
+                        </form>
+                      )}
+                      {canExpand && (
+                        <span className="ml-2 text-xs text-surface-400">
+                          {isExpanded ? "▲" : "▼"}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                  {isExpanded && (
+                    <tr key={`${p.id}-card`}>
+                      <td colSpan={TABLE_COLS} className="border-none bg-surface-50 p-0">
+                        <div className="px-5 py-4">
+                          <BtwFilingCard
+                            period={p}
+                            btwNumber={btwNumber}
+                            korActive={korActive}
+                          />
+                        </div>
+                      </td>
+                    </tr>
                   )}
-                </td>
-              </tr>
-            ))}
+                </Fragment>
+              );
+            })}
             {periods.length === 0 && (
               <tr>
-                <td colSpan={8} className="py-12 text-center text-surface-400">
+                <td colSpan={TABLE_COLS} className="py-12 text-center text-surface-400">
                   {t("btwEmpty")}
                 </td>
               </tr>

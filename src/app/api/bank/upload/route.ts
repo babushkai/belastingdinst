@@ -8,7 +8,7 @@ import { z } from "zod";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const result = await importBankFile(bankAccountId, buffer, file.name);
+  const result = await importBankFile(bankAccountId, buffer, file.name, session.user.id);
 
   return NextResponse.json(result);
 }

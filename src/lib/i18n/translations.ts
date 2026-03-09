@@ -221,6 +221,26 @@ export const translations = {
     nl: "Nog geen transacties. Importeer een bankbestand.",
     en: "No transactions yet. Import a bank file.",
   },
+  btwCodeNone: { nl: "—", en: "—" },
+  btwCodeAuto: { nl: "Automatisch herkend", en: "Auto-inferred" },
+  btwCodeManual: { nl: "Handmatig", en: "Manual" },
+  btwCodeLearned: { nl: "Geleerd van eerdere keuze", en: "Learned from previous choice" },
+  btwCodeLearnedShort: { nl: "geleerd", en: "learned" },
+  btwCodeAssumedTooltip: {
+    nl: "Vermoedelijk 21% — bevestig of corrigeer",
+    en: "Assumed 21% — confirm or correct",
+  },
+  btwReviewLink: { nl: "Bekijk onbeoordeeld", en: "Review unclassified" },
+  btwReviewBanner: {
+    nl: "{count} transacties wachten op BTW-beoordeling",
+    en: "{count} transactions need BTW review",
+  },
+  btwReviewEmpty: {
+    nl: "Alle transacties zijn beoordeeld!",
+    en: "All transactions have been reviewed!",
+  },
+  btwBatchSelected: { nl: "geselecteerd", en: "selected" },
+  btwBatchApply: { nl: "Toepassen", en: "Apply" },
 
   // ── BTW ──
   btwTitle: { nl: "BTW Aangifte", en: "VAT Return" },
@@ -240,11 +260,58 @@ export const translations = {
     nl: 'Nog geen BTW-periodes. Klik op "Bereken" om te starten.',
     en: 'No VAT periods yet. Click "Calculate" to start.',
   },
+  selectYear: { nl: "Jaar", en: "Year" },
+  selectQuarter: { nl: "Kwartaal", en: "Quarter" },
+  calculate: { nl: "Bereken", en: "Calculate" },
+  futureQuarter: {
+    nl: "Kan geen toekomstig kwartaal berekenen",
+    en: "Cannot calculate a future quarter",
+  },
   manualFiling: { nl: "Handmatig indienen", en: "Manual filing" },
   manualFilingDescription: {
     nl: 'Na het berekenen van de BTW-aangifte kun je de bedragen overnemen in Mijn Belastingdienst Zakelijk. De "Te betalen" bedrag is het nettobedrag dat je moet afdragen.',
     en: 'After calculating the VAT return, you can transfer the amounts to Mijn Belastingdienst Zakelijk. The "To pay" amount is the net amount you need to remit.',
   },
+  filingCard: { nl: "Aangifteoverzicht", en: "Filing summary" },
+  filingCardSubtitle: {
+    nl: "Kopieer de bedragen naar Mijn Belastingdienst Zakelijk",
+    en: "Copy the amounts to Mijn Belastingdienst Zakelijk",
+  },
+  omzet: { nl: "Omzet", en: "Revenue" },
+  btwAmount: { nl: "BTW", en: "VAT" },
+  copyValue: { nl: "Kopieer", en: "Copy" },
+  copied: { nl: "Gekopieerd!", en: "Copied!" },
+  filingStep1: {
+    nl: "Open Mijn Belastingdienst Zakelijk en kies \"Omzetbelasting\" → \"Aangifte doen\"",
+    en: "Open Mijn Belastingdienst Zakelijk and choose \"Turnover tax\" → \"File return\"",
+  },
+  filingStep2: {
+    nl: "Selecteer het juiste tijdvak",
+    en: "Select the correct filing period",
+  },
+  filingStep3: {
+    nl: "Kopieer de bedragen per rubriek hieronder naar het formulier",
+    en: "Copy the amounts per section below into the form",
+  },
+  filingStep4: {
+    nl: "Na indienen, klik \"Indienen\" hier om de periode te vergrendelen",
+    en: "After filing, click \"Submit\" here to lock the period",
+  },
+  btwNumberLabel: { nl: "BTW-nummer", en: "VAT number" },
+  fiscalPeriodLabel: { nl: "Aangiftetijdvak", en: "Filing period" },
+  korActiveNotice: {
+    nl: "KOR actief — geen BTW verschuldigd dit kwartaal",
+    en: "Small business scheme active — no VAT due this quarter",
+  },
+  btwNumberMissing: {
+    nl: "BTW-nummer niet ingesteld",
+    en: "VAT number not configured",
+  },
+  portalComputes: {
+    nl: "wordt berekend door de portal",
+    en: "computed by the portal",
+  },
+  revenue0: { nl: "Omzet 0%", en: "Revenue 0%" },
 
   // ── Settings ──
   settings: { nl: "Instellingen", en: "Settings" },

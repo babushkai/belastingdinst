@@ -1,15 +1,17 @@
 import { db } from "@/lib/db";
-import { transactions, syncLog } from "@/lib/db/schema";
+import { transactions, syncLog, bankAccounts } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { parseMT940, parseInfo86 } from "../parsers/mt940";
 import { parseCAMT053 } from "../parsers/camt053";
 import { parseWiseCsv } from "../parsers/wise-csv";
+import { loadAllInferenceRules, applyLearnedRuleSync } from "../btw-inference-rules";
 import type { ParsedTransaction, ImportResult } from "../types";
 
 export async function importBankFile(
   bankAccountId: string,
   fileBuffer: Buffer,
   filename: string,
+  userId: string,
 ): Promise<ImportResult> {
   const content = fileBuffer.toString("utf-8");
   const ext = filename.toLowerCase();
@@ -35,6 +37,13 @@ export async function importBankFile(
     return { imported: 0, skipped: 0, errors: [`Onbekend bestandsformaat: ${ext}`] };
   }
 
+  // Fetch own IBANs for self-transfer detection
+  const ownAccounts = await db.select({ iban: bankAccounts.iban }).from(bankAccounts);
+  const ownIbans = new Set(ownAccounts.map((a) => a.iban.toUpperCase()));
+
+  // Pre-fetch learned rules to avoid N+1
+  const rulesMap = await loadAllInferenceRules(userId);
+
   // Log sync start
   const [log] = await db
     .insert(syncLog)
@@ -50,6 +59,7 @@ export async function importBankFile(
 
   for (const tx of parsed) {
     try {
+      const inferred = applyLearnedRuleSync(tx, ownIbans, rulesMap);
       const result = await db
         .insert(transactions)
         .values({
@@ -62,6 +72,10 @@ export async function importBankFile(
           counterpartyIban: tx.counterpartyIban ?? null,
           description: tx.description ?? null,
           importSource: tx.importSource,
+          btwCode: inferred.btwCode,
+          btwCodeSource: inferred.btwCodeSource,
+          btwCodeSuggested: inferred.btwCodeSuggested,
+          inferenceRuleId: inferred.inferenceRuleId,
         })
         .onConflictDoNothing({
           target: [transactions.bankAccountId, transactions.externalId],

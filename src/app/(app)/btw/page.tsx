@@ -2,36 +2,28 @@ import { db } from "@/lib/db";
 import { btwPeriods } from "@/lib/db/schema";
 import { desc } from "drizzle-orm";
 import { saveBtwPeriod, lockAndFilePeriod } from "@/lib/btw/actions";
+import { getSettings } from "@/lib/settings/actions";
 import { BtwContent } from "@/components/BtwContent";
+import { APP_FIRST_YEAR } from "@/lib/config";
 
 export default async function BtwPage() {
-  const periods = await db
-    .select()
-    .from(btwPeriods)
-    .orderBy(desc(btwPeriods.year), desc(btwPeriods.periodNumber));
+  const [periods, settingsRow] = await Promise.all([
+    db
+      .select()
+      .from(btwPeriods)
+      .orderBy(desc(btwPeriods.year), desc(btwPeriods.periodNumber)),
+    getSettings(),
+  ]);
 
-  const currentYear = new Date().getFullYear();
-  const currentQuarter = Math.ceil((new Date().getMonth() + 1) / 3);
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentQuarter = Math.ceil((now.getMonth() + 1) / 3);
 
-  async function calculateAction(): Promise<{ error?: string }> {
-    "use server";
-    try {
-      await saveBtwPeriod(currentYear, currentQuarter, "quarterly");
-      return {};
-    } catch (e) {
-      return { error: e instanceof Error ? e.message : "Unknown error" };
-    }
-  }
-
-  async function fileAction(periodId: string): Promise<{ error?: string }> {
-    "use server";
-    try {
-      await lockAndFilePeriod(periodId);
-      return {};
-    } catch (e) {
-      return { error: e instanceof Error ? e.message : "Unknown error" };
-    }
-  }
+  const lockedPeriodKeys = new Set(
+    periods
+      .filter((p) => p.locked && p.periodType === "quarterly")
+      .map((p) => `${p.year}-${p.periodNumber}`),
+  );
 
   return (
     <BtwContent
@@ -43,6 +35,7 @@ export default async function BtwPage() {
         locked: p.locked,
         omzetHoogCents: p.omzetHoogCents,
         omzetLaagCents: p.omzetLaagCents,
+        omzetNulCents: p.omzetNulCents,
         btwHoogCents: p.btwHoogCents,
         btwLaagCents: p.btwLaagCents,
         btwInkoopCents: p.btwInkoopCents,
@@ -50,8 +43,12 @@ export default async function BtwPage() {
       }))}
       currentYear={currentYear}
       currentQuarter={currentQuarter}
-      calculateAction={calculateAction}
-      fileAction={fileAction}
+      firstYear={APP_FIRST_YEAR}
+      lockedPeriodKeys={Array.from(lockedPeriodKeys)}
+      btwNumber={settingsRow?.btwNumber ?? null}
+      korActive={settingsRow?.korActive ?? false}
+      calculateAction={saveBtwPeriod}
+      fileAction={lockAndFilePeriod}
     />
   );
 }

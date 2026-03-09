@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { invoices, invoiceLines, contacts } from "@/lib/db/schema";
+import { invoices, contacts } from "@/lib/db/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { InvoicesContent } from "@/components/InvoicesContent";
 

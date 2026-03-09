@@ -7,3 +7,4 @@ export { transactions, importSourceEnum } from "./transactions";
 export { btwPeriods, periodTypeEnum, btwPeriodStatusEnum } from "./btw-periods";
 export { syncLog, syncStatusEnum } from "./sync-log";
 export { loginAttempts } from "./login-attempts";
+export { btwInferenceRules } from "./btw-inference-rules";
