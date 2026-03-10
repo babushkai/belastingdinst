@@ -12,7 +12,6 @@ interface BankAccount {
   bankName: string | null;
   iban: string;
   lastSyncedAt: string | null;
-  pontoAccountId: string | null;
   wiseAccountId: string | null;
 }
 
@@ -64,7 +63,6 @@ export function BankContent({
                   </p>
                   <p className="font-mono text-sm text-gray-600">{acc.iban}</p>
                 </div>
-                {acc.pontoAccountId && <Badge variant="primary">Ponto</Badge>}
                 {acc.wiseAccountId && <Badge variant="success">Wise</Badge>}
               </div>
               <p className="mt-3 text-xs text-gray-500">
