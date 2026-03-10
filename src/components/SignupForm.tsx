@@ -26,25 +26,25 @@ export function SignupForm({
     : null;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-surface-100 via-primary-50 to-surface-100">
-      <div className="w-full max-w-sm space-y-6 rounded-2xl border border-surface-200 bg-white p-8 shadow-xl shadow-surface-200/50">
+    <div className="flex min-h-screen items-center justify-center bg-white">
+      <div className="w-full max-w-sm space-y-6 border border-black bg-white p-8">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-lg font-bold text-white shadow-md shadow-primary-600/30">
+            <div className="flex h-10 w-10 items-center justify-center border border-black text-lg font-bold text-black">
               B
             </div>
             <div>
-              <h1 className="text-xl font-bold text-surface-900">
+              <h1 className="text-xl font-bold text-black">
                 Belastingdinst
               </h1>
-              <p className="text-sm text-surface-500">{t("signupSubtitle")}</p>
+              <p className="text-sm text-gray-600">{t("signupSubtitle")}</p>
             </div>
           </div>
-          <LanguageSwitcher className="mt-1 text-surface-400 hover:!bg-surface-100 hover:!text-surface-600" />
+          <LanguageSwitcher className="mt-1 text-gray-500" />
         </div>
 
         {errorMessage && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <div className="border border-red-700 bg-white p-3 text-sm text-red-700">
             {errorMessage}
           </div>
         )}
@@ -53,7 +53,7 @@ export function SignupForm({
           <div>
             <label
               htmlFor="name"
-              className="mb-1.5 block text-sm font-medium text-surface-700"
+              className="mb-1.5 block text-sm font-medium text-black"
             >
               {t("signupName")}
             </label>
@@ -62,13 +62,13 @@ export function SignupForm({
               name="name"
               type="text"
               required
-              className="w-full rounded-lg border border-surface-300 bg-white px-3.5 py-2.5 text-sm text-surface-900 shadow-sm transition-colors placeholder:text-surface-400 hover:border-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+              className="w-full border border-black bg-white px-2 py-1.5 text-sm text-black placeholder:text-gray-500 focus:outline focus:outline-2 focus:outline-[#0000cc]"
             />
           </div>
           <div>
             <label
               htmlFor="email"
-              className="mb-1.5 block text-sm font-medium text-surface-700"
+              className="mb-1.5 block text-sm font-medium text-black"
             >
               {t("loginEmail")}
             </label>
@@ -77,13 +77,13 @@ export function SignupForm({
               name="email"
               type="email"
               required
-              className="w-full rounded-lg border border-surface-300 bg-white px-3.5 py-2.5 text-sm text-surface-900 shadow-sm transition-colors placeholder:text-surface-400 hover:border-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+              className="w-full border border-black bg-white px-2 py-1.5 text-sm text-black placeholder:text-gray-500 focus:outline focus:outline-2 focus:outline-[#0000cc]"
             />
           </div>
           <div>
             <label
               htmlFor="password"
-              className="mb-1.5 block text-sm font-medium text-surface-700"
+              className="mb-1.5 block text-sm font-medium text-black"
             >
               {t("loginPassword")}
             </label>
@@ -93,13 +93,13 @@ export function SignupForm({
               type="password"
               required
               minLength={8}
-              className="w-full rounded-lg border border-surface-300 bg-white px-3.5 py-2.5 text-sm text-surface-900 shadow-sm transition-colors placeholder:text-surface-400 hover:border-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+              className="w-full border border-black bg-white px-2 py-1.5 text-sm text-black placeholder:text-gray-500 focus:outline focus:outline-2 focus:outline-[#0000cc]"
             />
           </div>
           <div>
             <label
               htmlFor="confirmPassword"
-              className="mb-1.5 block text-sm font-medium text-surface-700"
+              className="mb-1.5 block text-sm font-medium text-black"
             >
               {t("signupConfirmPassword")}
             </label>
@@ -109,22 +109,22 @@ export function SignupForm({
               type="password"
               required
               minLength={8}
-              className="w-full rounded-lg border border-surface-300 bg-white px-3.5 py-2.5 text-sm text-surface-900 shadow-sm transition-colors placeholder:text-surface-400 hover:border-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+              className="w-full border border-black bg-white px-2 py-1.5 text-sm text-black placeholder:text-gray-500 focus:outline focus:outline-2 focus:outline-[#0000cc]"
             />
           </div>
           <button
             type="submit"
-            className="w-full rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-primary-600/25 transition-all hover:bg-primary-700 hover:shadow-lg hover:shadow-primary-600/30 active:scale-[0.98]"
+            className="w-full border border-black bg-black text-white px-4 py-2 text-sm hover:bg-white hover:text-black"
           >
             {t("signupButton")}
           </button>
         </form>
 
-        <p className="text-center text-sm text-surface-500">
+        <p className="text-center text-sm text-gray-600">
           {t("signupHasAccount")}{" "}
           <Link
             href="/login"
-            className="font-medium text-primary-600 hover:text-primary-700"
+            className="font-medium text-[#0000cc] hover:text-[#000099]"
           >
             {t("signupLoginLink")}
           </Link>

@@ -9,7 +9,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
     <button
       type="button"
       onClick={() => setLocale(locale === "nl" ? "en" : "nl")}
-      className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors hover:bg-surface-700 ${className}`}
+      className={`border border-black px-2 py-0.5 text-xs hover:bg-black hover:text-white ${className}`}
       title={locale === "nl" ? "Switch to English" : "Wissel naar Nederlands"}
     >
       {locale === "nl" ? "EN" : "NL"}

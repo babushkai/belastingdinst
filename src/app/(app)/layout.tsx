@@ -18,7 +18,7 @@ export default async function AppLayout({
   return (
     <div className="flex h-screen">
       <Sidebar email={session.user?.email} signOutAction={signOutAction} />
-      <main className="flex-1 overflow-y-auto bg-surface-50 px-10 py-8 text-surface-900">
+      <main className="flex-1 overflow-y-auto bg-white px-8 py-6 text-black">
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>
     </div>

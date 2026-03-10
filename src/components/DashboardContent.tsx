@@ -30,14 +30,14 @@ export function DashboardContent({ data }: { data: DashboardData }) {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-surface-900">{t("dashboard")}</h1>
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+      <h1 className="mb-6 text-xl font-bold uppercase tracking-widest text-black border-b border-black pb-2">{t("dashboard")}</h1>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {/* Open invoices */}
-        <div className="rounded-xl border border-surface-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-medium text-surface-500">{t("openInvoices")}</h2>
-          <p className="mt-1 text-3xl font-bold text-primary-600">{data.openCount}</p>
+        <div className="border border-black bg-white p-4">
+          <h2 className="text-xs uppercase text-gray-600">{t("openInvoices")}</h2>
+          <p className="mt-1 text-3xl font-bold text-black">{data.openCount}</p>
           {data.openTotalCents > 0 && (
-            <p className="mt-1 text-sm font-medium text-surface-500">
+            <p className="mt-1 text-sm text-gray-600">
               {formatCurrency(data.openTotalCents)}
             </p>
           )}
@@ -49,9 +49,9 @@ export function DashboardContent({ data }: { data: DashboardData }) {
         </div>
 
         {/* BTW period */}
-        <div className="rounded-xl border border-surface-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-medium text-surface-500">{t("btwPeriod")}</h2>
-          <p className="mt-1 text-3xl font-bold text-surface-900">
+        <div className="border border-black bg-white p-4">
+          <h2 className="text-xs uppercase text-gray-600">{t("btwPeriod")}</h2>
+          <p className="mt-1 text-3xl font-bold text-black">
             {data.currentBtw
               ? `Q${data.currentBtw.periodNumber} ${data.currentBtw.year}`
               : t("none")}
@@ -73,9 +73,9 @@ export function DashboardContent({ data }: { data: DashboardData }) {
         </div>
 
         {/* Last sync */}
-        <div className="rounded-xl border border-surface-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-medium text-surface-500">{t("lastBankSync")}</h2>
-          <p className="mt-1 text-lg font-medium text-surface-700">
+        <div className="border border-black bg-white p-4">
+          <h2 className="text-xs uppercase text-gray-600">{t("lastBankSync")}</h2>
+          <p className="mt-1 text-lg font-medium text-black">
             {data.lastSyncDate ? formatRelativeDate(data.lastSyncDate) : t("notSyncedYet")}
           </p>
           <div className="mt-4">

@@ -43,10 +43,10 @@ export function PeriodSelector({
             key={y}
             type="button"
             onClick={() => onYearChange(y)}
-            className={`shrink-0 rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${
+            className={`shrink-0 border border-black px-2 py-1 text-xs ${
               y === selectedYear
-                ? "bg-surface-900 text-white shadow-sm"
-                : "border border-surface-200 text-surface-500 hover:bg-surface-50 hover:text-surface-700"
+                ? "bg-black text-white"
+                : "bg-white text-black hover:bg-gray-100"
             }`}
           >
             {y}
@@ -55,25 +55,25 @@ export function PeriodSelector({
       </div>
 
       {/* Quarter segmented control */}
-      <div className="inline-flex overflow-hidden rounded-lg border border-surface-200 shadow-sm">
+      <div className="inline-flex border border-black">
         {([1, 2, 3, 4] as const).map((q) => {
           const isAvailable = availableQuarters.includes(q);
           const isSelected = q === selectedQuarter;
           const isLocked = lockedKeys.has(`${selectedYear}-${q}`);
 
           let className =
-            "relative px-4 py-1.5 text-sm font-medium transition-all border-r border-surface-200 last:border-r-0";
+            "px-3 py-1 text-xs border-r border-black last:border-r-0";
 
           if (!isAvailable) {
-            className += " bg-surface-50 text-surface-300";
+            className += " bg-gray-100 text-gray-400";
           } else if (isSelected && isLocked) {
-            className += " bg-emerald-50 text-emerald-700";
+            className += " bg-black text-green-400";
           } else if (isSelected) {
-            className += " bg-primary-600 text-white shadow-inner";
+            className += " bg-black text-white";
           } else if (isLocked) {
-            className += " bg-white text-emerald-600 hover:bg-emerald-50";
+            className += " bg-white text-green-700 hover:bg-gray-100";
           } else {
-            className += " bg-white text-surface-600 hover:bg-surface-50";
+            className += " bg-white text-black hover:bg-gray-100";
           }
 
           return (

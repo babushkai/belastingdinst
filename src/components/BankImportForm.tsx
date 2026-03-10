@@ -56,18 +56,18 @@ export function BankImportForm({
           {t("cancel")}
         </LinkButton>
       </PageHeader>
-      <p className="mb-4 text-sm text-surface-500">
+      <p className="mb-4 text-sm text-gray-600">
         {t("bankImportDescription")}
       </p>
 
-      <div className="rounded-xl border border-surface-200 bg-white p-6 shadow-sm">
+      <div className="border border-black bg-white p-6">
         <form onSubmit={handleUpload} className="space-y-5">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-surface-700">
+            <label className="mb-1.5 block text-sm font-medium text-black">
               {t("bankAccount")}
             </label>
             {accounts.length === 0 ? (
-              <p className="text-sm text-surface-400">
+              <p className="text-sm text-gray-500">
                 {t("bankAccountsEmpty")}
               </p>
             ) : (
@@ -87,10 +87,10 @@ export function BankImportForm({
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-surface-700">
+            <label className="mb-1.5 block text-sm font-medium text-black">
               {t("file")}
             </label>
-            <div className="rounded-lg border-2 border-dashed border-surface-300 px-6 py-8 text-center transition-colors hover:border-primary-400">
+            <div className="border-2 border-dashed border-black px-6 py-8 text-center">
               <input
                 type="file"
                 name="file"
@@ -100,9 +100,9 @@ export function BankImportForm({
                 onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
                 required
               />
-              <p className="text-sm text-surface-500">
+              <p className="text-sm text-gray-600">
                 {fileName ? (
-                  <span className="font-medium text-surface-900">{fileName}</span>
+                  <span className="font-medium text-black">{fileName}</span>
                 ) : (
                   <>MT940, CAMT.053 (XML), Wise CSV</>
                 )}
@@ -117,16 +117,16 @@ export function BankImportForm({
       </div>
 
       {result && (
-        <div className="mt-6 rounded-xl border border-surface-200 bg-white p-5 shadow-sm">
+        <div className="mt-6 border border-black bg-white p-5">
           {result.error ? (
             <p className="text-sm font-medium text-red-600">{result.error}</p>
           ) : (
             <>
-              <h2 className="font-semibold text-surface-900">{t("result")}</h2>
-              <p className="mt-2 text-sm text-emerald-600">
+              <h2 className="font-semibold text-black">{t("result")}</h2>
+              <p className="mt-2 text-sm text-green-700">
                 {t("imported")} {result.imported ?? 0}
               </p>
-              <p className="text-sm text-surface-500">
+              <p className="text-sm text-gray-600">
                 {t("skippedDuplicates")} {result.skipped ?? 0}
               </p>
               {(result.errors?.length ?? 0) > 0 && (

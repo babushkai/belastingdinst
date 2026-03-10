@@ -128,7 +128,7 @@ export function BtwContent({
   return (
     <div>
       {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div className="mb-4 border border-red-700 bg-white p-3 text-sm text-red-700">
           {error}
           <button
             type="button"
@@ -155,7 +155,7 @@ export function BtwContent({
 
         <div className="flex items-center gap-3">
           {isSelectedLocked && (
-            <span className="text-sm text-emerald-600">
+            <span className="text-sm text-green-700">
               Q{selectedQuarter} {selectedYear} {t("locked")}
             </span>
           )}
@@ -183,10 +183,10 @@ export function BtwContent({
         </div>
       </div>
 
-      <div className="overflow-x-auto overflow-hidden rounded-xl border border-surface-200 bg-white shadow-sm">
+      <div className="overflow-x-auto border border-black bg-white">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-surface-200 bg-surface-50 text-left text-xs font-medium uppercase tracking-wider text-surface-500">
+            <tr className="border-b border-black bg-white text-left text-xs font-medium uppercase tracking-wider text-gray-600">
               <th className="px-5 py-3">{t("period")}</th>
               <th className="px-5 py-3">{t("status")}</th>
               <th className="px-5 py-3 text-right">{t("revenue21")}</th>
@@ -197,7 +197,7 @@ export function BtwContent({
               <th className="px-5 py-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-surface-100">
+          <tbody className="divide-y divide-gray-300">
             {periods.map((p) => {
               const isExpanded = expandedId === p.id;
               const canExpand = p.status === "calculated" || p.status === "filed";
@@ -206,9 +206,9 @@ export function BtwContent({
                 <Fragment key={p.id}>
                   <tr
                     onClick={canExpand ? () => setExpandedId(isExpanded ? null : p.id) : undefined}
-                    className={`transition-colors hover:bg-surface-50 ${canExpand ? "cursor-pointer" : ""} ${isExpanded ? "bg-surface-50" : ""}`}
+                    className={`hover:bg-gray-50 ${canExpand ? "cursor-pointer" : ""} ${isExpanded ? "bg-gray-50" : ""}`}
                   >
-                    <td className="px-5 py-3.5 font-medium text-surface-900">
+                    <td className="px-5 py-3.5 font-medium text-black">
                       Q{p.periodNumber} {p.year}
                     </td>
                     <td className="px-5 py-3.5">
@@ -219,19 +219,19 @@ export function BtwContent({
                         {p.locked && ` ${t("locked")}`}
                       </Badge>
                     </td>
-                    <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
+                    <td className="px-5 py-3.5 text-right font-mono text-sm text-black">
                       {formatCurrency(p.omzetHoogCents)}
                     </td>
-                    <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
+                    <td className="px-5 py-3.5 text-right font-mono text-sm text-black">
                       {formatCurrency(p.omzetLaagCents)}
                     </td>
-                    <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
+                    <td className="px-5 py-3.5 text-right font-mono text-sm text-black">
                       {formatCurrency(p.btwHoogCents + p.btwLaagCents)}
                     </td>
-                    <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-700">
+                    <td className="px-5 py-3.5 text-right font-mono text-sm text-black">
                       {formatCurrency(p.btwInkoopCents)}
                     </td>
-                    <td className="px-5 py-3.5 text-right font-mono font-bold text-surface-900">
+                    <td className="px-5 py-3.5 text-right font-mono font-bold text-black">
                       {formatCurrency(p.btwTeBetalen)}
                     </td>
                     <td className="px-5 py-3.5 text-right">
@@ -242,13 +242,13 @@ export function BtwContent({
                             e.stopPropagation();
                             setConfirmingPeriodId(p.id);
                           }}
-                          className="text-sm font-medium text-primary-600 hover:text-primary-700"
+                          className="text-sm font-medium text-[#0000cc] hover:text-[#000099]"
                         >
                           {t("submit")}
                         </button>
                       )}
                       {canExpand && (
-                        <span className="ml-2 text-xs text-surface-400">
+                        <span className="ml-2 text-xs text-gray-500">
                           {isExpanded ? "▲" : "▼"}
                         </span>
                       )}
@@ -256,7 +256,7 @@ export function BtwContent({
                   </tr>
                   {isExpanded && (
                     <tr key={`${p.id}-card`}>
-                      <td colSpan={TABLE_COLS} className="border-none bg-surface-50 p-0">
+                      <td colSpan={TABLE_COLS} className="border-none bg-gray-50 p-0">
                         <div className="px-5 py-4">
                           <BtwFilingCard
                             period={p}
@@ -273,7 +273,7 @@ export function BtwContent({
             })}
             {periods.length === 0 && (
               <tr>
-                <td colSpan={TABLE_COLS} className="py-12 text-center text-surface-400">
+                <td colSpan={TABLE_COLS} className="py-12 text-center text-gray-500">
                   {t("btwEmpty")}
                 </td>
               </tr>
@@ -282,15 +282,15 @@ export function BtwContent({
         </table>
       </div>
 
-      <div className="mt-6 rounded-xl border border-primary-100 bg-primary-50/50 p-5 text-sm text-surface-600">
-        <p className="font-semibold text-surface-800">{t("manualFiling")}</p>
+      <div className="mt-6 border border-black bg-white p-5 text-sm text-gray-600">
+        <p className="font-semibold text-black">{t("manualFiling")}</p>
         <p className="mt-1">{t("manualFilingDescription")}</p>
       </div>
 
       {/* Confirmation modal */}
       {confirmingPeriodId && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
           onClick={() => {
             if (!filing) {
               setConfirmingPeriodId(null);
@@ -299,20 +299,20 @@ export function BtwContent({
           }}
         >
           <div
-            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+            className="w-full max-w-md border border-black bg-white p-6"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-semibold text-surface-900">
+            <h3 className="text-lg font-semibold text-black">
               {t("filingConfirmTitle")}
             </h3>
-            <p className="mt-2 text-sm text-surface-600">
+            <p className="mt-2 text-sm text-gray-600">
               {t("filingConfirmDescription")}
             </p>
 
             <div className="mt-4">
               <label
                 htmlFor="confirmation-number"
-                className="block text-sm font-medium text-surface-700"
+                className="block text-sm font-medium text-black"
               >
                 {t("confirmationNumber")}
               </label>
@@ -322,7 +322,7 @@ export function BtwContent({
                 value={confirmationNumber}
                 onChange={(e) => setConfirmationNumber(e.target.value)}
                 placeholder={t("confirmationNumberPlaceholder")}
-                className="mt-1 w-full rounded-lg border border-surface-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="mt-1 w-full border border-black px-2 py-1.5 text-sm focus:outline focus:outline-2 focus:outline-[#0000cc]"
               />
             </div>
 
@@ -334,7 +334,7 @@ export function BtwContent({
                   setConfirmationNumber("");
                 }}
                 disabled={filing}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-surface-600 hover:bg-surface-100 disabled:opacity-50"
+                className="border border-black px-4 py-2 text-sm font-medium text-black hover:bg-gray-100 disabled:opacity-50"
               >
                 {t("cancel")}
               </button>
@@ -342,7 +342,7 @@ export function BtwContent({
                 type="button"
                 onClick={handleConfirmFiling}
                 disabled={filing}
-                className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 disabled:opacity-50"
+                className="border border-black bg-black px-4 py-2 text-sm font-medium text-white hover:bg-white hover:text-black disabled:opacity-50"
               >
                 {filing ? "..." : t("confirmAndLock")}
               </button>

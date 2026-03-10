@@ -1,63 +1,58 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary-50: oklch(0.97 0.014 264);
-  --color-primary-100: oklch(0.94 0.028 264);
-  --color-primary-200: oklch(0.87 0.056 264);
-  --color-primary-300: oklch(0.78 0.084 264);
-  --color-primary-400: oklch(0.67 0.112 264);
-  --color-primary-500: oklch(0.59 0.14 264);
-  --color-primary-600: oklch(0.52 0.14 264);
-  --color-primary-700: oklch(0.46 0.12 264);
-  --color-primary-800: oklch(0.39 0.1 264);
-  --color-primary-900: oklch(0.33 0.08 264);
-  --color-primary-950: oklch(0.24 0.06 264);
+  /* Raw palette — black, white, link blue, semantic colors only */
+  --color-primary-50: #f5f5f5;
+  --color-primary-100: #e5e5e5;
+  --color-primary-200: #cccccc;
+  --color-primary-300: #999999;
+  --color-primary-400: #666666;
+  --color-primary-500: #0000cc;
+  --color-primary-600: #0000cc;
+  --color-primary-700: #000099;
+  --color-primary-800: #000066;
+  --color-primary-900: #000033;
+  --color-primary-950: #000000;
 
-  --color-surface-50: oklch(0.985 0.002 264);
-  --color-surface-100: oklch(0.968 0.004 264);
-  --color-surface-200: oklch(0.928 0.006 264);
-  --color-surface-300: oklch(0.869 0.01 264);
-  --color-surface-400: oklch(0.704 0.015 264);
-  --color-surface-500: oklch(0.554 0.02 264);
-  --color-surface-600: oklch(0.446 0.02 264);
-  --color-surface-700: oklch(0.372 0.017 264);
-  --color-surface-800: oklch(0.279 0.014 264);
-  --color-surface-900: oklch(0.208 0.012 264);
-  --color-surface-950: oklch(0.13 0.01 264);
+  --color-surface-50: #ffffff;
+  --color-surface-100: #f5f5f5;
+  --color-surface-200: #e0e0e0;
+  --color-surface-300: #cccccc;
+  --color-surface-400: #999999;
+  --color-surface-500: #666666;
+  --color-surface-600: #444444;
+  --color-surface-700: #333333;
+  --color-surface-800: #222222;
+  --color-surface-900: #000000;
+  --color-surface-950: #000000;
 
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
+  /* Zero radius everywhere */
+  --radius: 0;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
 }
 
-/* Base styles */
+/* Base styles — monospace everything */
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-  -webkit-font-smoothing: antialiased;
+  font-family: "Courier New", Courier, "Liberation Mono", monospace;
 }
 
-/* Smooth focus rings */
+/* Raw focus — no rounded corners */
 *:focus-visible {
-  outline: 2px solid var(--color-primary-500);
-  outline-offset: 2px;
-  border-radius: 4px;
+  outline: 2px solid #0000cc;
+  outline-offset: 0;
 }
 
-/* Better scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: oklch(0.7 0.01 264);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.55 0.015 264);
+/* Classic link styling */
+@layer base {
+  a {
+    color: #0000cc;
+  }
+  a:visited {
+    color: #551a8b;
+  }
 }
 
 /* Screen reader only */
@@ -71,13 +66,4 @@ body {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
-}
-
-@layer base {
-  h1 {
-    letter-spacing: -0.025em;
-  }
-  th {
-    letter-spacing: 0.05em;
-  }
 }

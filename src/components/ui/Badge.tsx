@@ -1,9 +1,9 @@
 const variants = {
-  default: "bg-surface-100 text-surface-600",
-  primary: "bg-primary-50 text-primary-700",
-  success: "bg-emerald-50 text-emerald-700",
-  warning: "bg-amber-50 text-amber-700",
-  danger: "bg-red-50 text-red-700",
+  default: "text-black",
+  primary: "text-[#0000cc]",
+  success: "text-green-700",
+  warning: "text-amber-700",
+  danger: "text-red-700",
 } as const;
 
 interface BadgeProps {
@@ -19,9 +19,9 @@ export function Badge({
 }: BadgeProps) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${variants[variant]} ${className}`}
+      className={`text-xs font-mono ${variants[variant]} ${className}`}
     >
-      {children}
+      [{children}]
     </span>
   );
 }

@@ -67,7 +67,7 @@ function CopyButton({ value, label }: { value: string; label: string }) {
       type="button"
       onClick={handleCopy}
       title={`${t("copyValue")} ${label}`}
-      className="rounded px-1.5 py-0.5 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700"
+      className="border border-black px-1 py-0.5 text-xs font-medium hover:bg-black hover:text-white"
     >
       {copied ? t("copied") : t("copyValue")}
     </button>
@@ -102,20 +102,20 @@ export function BtwFilingCard({ period, btwNumber, korActive, onFileClick }: Btw
     : null;
 
   return (
-    <div className="rounded-xl border border-surface-200 bg-white p-5 shadow-sm">
+    <div className="border border-black bg-white p-4">
       {/* Header */}
-      <div className="mb-4 flex items-start justify-between border-b border-surface-100 pb-4">
+      <div className="mb-4 flex items-start justify-between border-b border-black pb-4">
         <div>
-          <h3 className="text-lg font-semibold text-surface-900">
+          <h3 className="text-lg font-semibold text-black">
             {t("filingCard")} — {periodLabel}
           </h3>
-          <p className="mt-0.5 text-sm text-surface-500">{dateRange}</p>
+          <p className="mt-0.5 text-sm text-gray-600">{dateRange}</p>
           {/* Filed status with confirmation number */}
           {p.status === "filed" && filedDate && (
-            <p className="mt-1 text-sm text-emerald-600">
+            <p className="mt-1 text-sm text-green-700">
               {t("filedOn")} {filedDate}
               {p.confirmationNumber && (
-                <span className="ml-2 font-mono text-surface-600">
+                <span className="ml-2 font-mono text-gray-600">
                   — {t("confirmationNumber")}: {p.confirmationNumber}
                 </span>
               )}
@@ -123,11 +123,11 @@ export function BtwFilingCard({ period, btwNumber, korActive, onFileClick }: Btw
           )}
         </div>
         <div className="text-right text-sm">
-          <div className="text-surface-500">{t("btwNumberLabel")}</div>
+          <div className="text-gray-600">{t("btwNumberLabel")}</div>
           {btwNumber ? (
-            <div className="font-mono font-medium text-surface-900">{btwNumber}</div>
+            <div className="font-mono font-medium text-black">{btwNumber}</div>
           ) : (
-            <div className="italic text-surface-400">
+            <div className="italic text-gray-500">
               {t("btwNumberMissing")}
             </div>
           )}
@@ -136,7 +136,7 @@ export function BtwFilingCard({ period, btwNumber, korActive, onFileClick }: Btw
 
       {/* KOR notice */}
       {isKorApplied && (
-        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-800">
+        <div className="mb-4 border border-amber-700 bg-white px-4 py-2.5 text-sm font-medium text-amber-800">
           {t("korActiveNotice")}
         </div>
       )}
@@ -151,7 +151,7 @@ export function BtwFilingCard({ period, btwNumber, korActive, onFileClick }: Btw
           href={BELASTINGDIENST_OB_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700"
+          className="inline-flex items-center gap-1.5 border border-black px-2.5 py-1 text-xs font-medium text-[#0000cc] hover:bg-black hover:text-white"
         >
           {t("openPortal")}
           <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -162,7 +162,7 @@ export function BtwFilingCard({ period, btwNumber, korActive, onFileClick }: Btw
           href={`/btw/${p.id}/print`}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded px-2.5 py-1 text-xs font-medium text-surface-500 transition-colors hover:bg-surface-100 hover:text-surface-700"
+          className="border border-black px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-black hover:text-white"
         >
           {t("printSummary")}
         </a>
@@ -171,7 +171,7 @@ export function BtwFilingCard({ period, btwNumber, korActive, onFileClick }: Btw
           <button
             type="button"
             onClick={onFileClick}
-            className="ml-auto rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-700"
+            className="ml-auto border border-black bg-black px-3 py-1.5 text-xs font-medium text-white hover:bg-white hover:text-black"
           >
             {t("submit")}
           </button>
@@ -181,7 +181,7 @@ export function BtwFilingCard({ period, btwNumber, korActive, onFileClick }: Btw
       {/* Rubrieken table */}
       <table className="w-full">
         <thead>
-          <tr className="border-b border-surface-200 text-left text-xs font-medium uppercase tracking-wider text-surface-400">
+          <tr className="border-b border-black text-left text-xs font-medium uppercase tracking-wider text-gray-500">
             <th className="pb-2 pr-4">Rubriek</th>
             <th className="pb-2 pr-4">Omschrijving</th>
             <th className="pb-2 pr-4 text-right">{t("omzet")}</th>
@@ -189,16 +189,16 @@ export function BtwFilingCard({ period, btwNumber, korActive, onFileClick }: Btw
             <th className="pb-2"></th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-surface-50">
+        <tbody className="divide-y divide-gray-300">
           {rows.map((row) => (
             <tr key={row.code}>
-              <td className="py-2.5 pr-4 font-mono text-sm font-semibold text-surface-500">
+              <td className="py-2.5 pr-4 font-mono text-sm font-semibold text-gray-600">
                 {row.code}
               </td>
-              <td className="py-2.5 pr-4 text-sm text-surface-600">
+              <td className="py-2.5 pr-4 text-sm text-gray-600">
                 {row.desc}
               </td>
-              <td className="py-2.5 pr-4 text-right font-mono text-sm text-surface-700">
+              <td className="py-2.5 pr-4 text-right font-mono text-sm text-black">
                 {row.omzetCents !== null ? (
                   <span className="inline-flex items-center gap-1.5">
                     {formatCurrency(row.omzetCents)}
@@ -208,10 +208,10 @@ export function BtwFilingCard({ period, btwNumber, korActive, onFileClick }: Btw
                     />
                   </span>
                 ) : (
-                  <span className="text-surface-300">—</span>
+                  <span className="text-gray-400">—</span>
                 )}
               </td>
-              <td className="py-2.5 pr-4 text-right font-mono text-sm text-surface-700">
+              <td className="py-2.5 pr-4 text-right font-mono text-sm text-black">
                 {row.btwCents !== null ? (
                   <span className="inline-flex items-center gap-1.5">
                     {formatCurrency(row.btwCents)}
@@ -221,7 +221,7 @@ export function BtwFilingCard({ period, btwNumber, korActive, onFileClick }: Btw
                     />
                   </span>
                 ) : (
-                  <span className="text-surface-300">—</span>
+                  <span className="text-gray-400">—</span>
                 )}
               </td>
               <td className="py-2.5"></td>
@@ -229,24 +229,24 @@ export function BtwFilingCard({ period, btwNumber, korActive, onFileClick }: Btw
           ))}
 
           {/* 5g — total, computed by portal */}
-          <tr className="border-t border-surface-200">
-            <td className="py-2.5 pr-4 font-mono text-sm font-bold text-surface-700">
+          <tr className="border-t border-black">
+            <td className="py-2.5 pr-4 font-mono text-sm font-bold text-black">
               5g
             </td>
-            <td className="py-2.5 pr-4 text-sm font-semibold text-surface-800">
+            <td className="py-2.5 pr-4 text-sm font-semibold text-black">
               Totaal te betalen / terug te ontvangen
             </td>
             <td className="py-2.5 pr-4"></td>
             <td className="py-2.5 pr-4 text-right">
               <span
                 className={`font-mono text-sm font-bold ${
-                  p.btwTeBetalen >= 0 ? "text-red-600" : "text-emerald-600"
+                  p.btwTeBetalen >= 0 ? "text-red-600" : "text-green-700"
                 }`}
               >
                 {formatCurrency(p.btwTeBetalen)}
               </span>
             </td>
-            <td className="py-2.5 text-xs text-surface-400">
+            <td className="py-2.5 text-xs text-gray-500">
               {t("portalComputes")}
             </td>
           </tr>
@@ -254,11 +254,11 @@ export function BtwFilingCard({ period, btwNumber, korActive, onFileClick }: Btw
       </table>
 
       {/* Filing instructions */}
-      <div className="mt-4 border-t border-surface-100 pt-4">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-surface-400">
+      <div className="mt-4 border-t border-black pt-4">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
           {t("manualFiling")}
         </p>
-        <ol className="list-inside list-decimal space-y-1 text-sm text-surface-600">
+        <ol className="list-inside list-decimal space-y-1 text-sm text-gray-600">
           <li>{t("filingStep1")}</li>
           <li>{t("filingStep2")}</li>
           <li>{t("filingStep3")}</li>

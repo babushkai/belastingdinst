@@ -123,24 +123,24 @@ export function WiseSetupContent({
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-surface-900">
+        <h1 className="text-2xl font-bold text-black">
           {t("wiseIntegration")}
         </h1>
         <Link
           href="/bank"
-          className="inline-flex items-center rounded-lg border border-surface-300 bg-white px-4 py-2.5 text-sm font-medium text-surface-700 shadow-sm transition-colors hover:bg-surface-50"
+          className="inline-flex items-center border border-black bg-white px-4 py-2.5 text-sm font-medium text-black hover:bg-gray-50"
         >
           {t("cancel")}
         </Link>
       </div>
 
-      <p className="mb-6 text-sm text-surface-500">
+      <p className="mb-6 text-sm text-gray-600">
         {t("wiseSetupDescription")}
       </p>
 
       {/* Setup form */}
-      <div className="mb-8 rounded-xl border border-surface-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-lg font-semibold text-surface-800">
+      <div className="mb-8 border border-black bg-white p-6">
+        <h2 className="mb-4 text-lg font-semibold text-black">
           {t("wiseSetup")}
         </h2>
 
@@ -148,7 +148,7 @@ export function WiseSetupContent({
           <div>
             <label
               htmlFor="apiToken"
-              className="mb-1.5 block text-sm font-medium text-surface-700"
+              className="mb-1.5 block text-sm font-medium text-black"
             >
               {t("wiseApiToken")}
             </label>
@@ -159,14 +159,14 @@ export function WiseSetupContent({
               onChange={(e) => setApiToken(e.target.value)}
               placeholder={t("wiseApiTokenPlaceholder")}
               required
-              className="w-full rounded-lg border border-surface-300 bg-white px-3.5 py-2.5 text-sm text-surface-900 shadow-sm transition-colors placeholder:text-surface-400 hover:border-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+              className="w-full border border-black bg-white px-2 py-1.5 text-sm text-black placeholder:text-gray-500 focus:outline focus:outline-2 focus:outline-[#0000cc]"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-primary-600/25 transition-all hover:bg-primary-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="border border-black bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-white hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? t("wiseConnecting") : t("wiseConnectButton")}
           </button>
@@ -174,10 +174,10 @@ export function WiseSetupContent({
 
         {result && (
           <div
-            className={`mt-4 rounded-lg border p-3 text-sm ${
+            className={`mt-4 border p-3 text-sm ${
               result.success
-                ? "border-green-200 bg-green-50 text-green-700"
-                : "border-red-200 bg-red-50 text-red-700"
+                ? "border-green-700 bg-white text-green-700"
+                : "border-red-700 bg-white text-red-700"
             }`}
           >
             {result.message}
@@ -187,8 +187,8 @@ export function WiseSetupContent({
 
       {/* Sync section */}
       {allConnected.length > 0 && (
-        <div className="rounded-xl border border-surface-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold text-surface-800">
+        <div className="border border-black bg-white p-6">
+          <h2 className="mb-4 text-lg font-semibold text-black">
             {t("wiseSync")}
           </h2>
 
@@ -196,7 +196,7 @@ export function WiseSetupContent({
             <div className="flex-1">
               <label
                 htmlFor="syncAccountId"
-                className="mb-1.5 block text-sm font-medium text-surface-700"
+                className="mb-1.5 block text-sm font-medium text-black"
               >
                 {t("bankAccount")}
               </label>
@@ -204,7 +204,7 @@ export function WiseSetupContent({
                 id="syncAccountId"
                 value={syncAccountId}
                 onChange={(e) => setSyncAccountId(e.target.value)}
-                className="w-full rounded-lg border border-surface-300 bg-white px-3.5 py-2.5 text-sm text-surface-900 shadow-sm transition-colors hover:border-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+                className="w-full border border-black bg-white px-2 py-1.5 text-sm text-black focus:outline focus:outline-2 focus:outline-[#0000cc]"
               >
                 {allConnected.map((acc) => (
                   <option key={acc.id} value={acc.id}>
@@ -218,7 +218,7 @@ export function WiseSetupContent({
               type="button"
               onClick={handleSync}
               disabled={syncing || !syncAccountId}
-              className="rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-600/25 transition-all hover:bg-emerald-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="border border-black bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-white hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {syncing ? t("wiseSyncing") : t("wiseSync")}
             </button>
@@ -226,10 +226,10 @@ export function WiseSetupContent({
 
           {syncResult && (
             <div
-              className={`mt-4 rounded-lg border p-3 text-sm ${
+              className={`mt-4 border p-3 text-sm ${
                 syncResult.success
-                  ? "border-green-200 bg-green-50 text-green-700"
-                  : "border-red-200 bg-red-50 text-red-700"
+                  ? "border-green-700 bg-white text-green-700"
+                  : "border-red-700 bg-white text-red-700"
               }`}
             >
               {syncResult.message}
