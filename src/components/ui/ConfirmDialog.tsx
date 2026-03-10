@@ -76,7 +76,7 @@ export function ConfirmDialog({
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-surface-950/40 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
       onClick={(e) => {
         if (e.target === overlayRef.current) onCancel();
       }}
@@ -86,15 +86,15 @@ export function ConfirmDialog({
     >
       <div
         role="document"
-        className="mx-4 w-full max-w-sm rounded-xl border border-surface-200 bg-white p-6 shadow-xl"
+        className="mx-4 w-full max-w-sm border border-black bg-white p-6"
       >
         <h2
           id={titleId}
-          className="text-lg font-semibold text-surface-900"
+          className="text-lg font-bold text-black"
         >
           {title}
         </h2>
-        <p className="mt-2 text-sm text-surface-600">{message}</p>
+        <p className="mt-2 text-sm text-black">{message}</p>
         <div className="mt-5 flex justify-end gap-3">
           <Button ref={cancelRef} variant="secondary" size="sm" onClick={onCancel}>
             Annuleren

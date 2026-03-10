@@ -48,15 +48,15 @@ export function ContactsContent({
       </PageHeader>
 
       {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div className="mb-4 border border-red-700 bg-white p-3 text-sm text-red-700">
           {error}
         </div>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-surface-200 bg-white shadow-sm">
+      <div className="overflow-hidden border border-black bg-white">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-surface-200 bg-surface-50 text-left text-xs font-medium uppercase tracking-wider text-surface-500">
+            <tr className="border-b border-black bg-white text-left text-xs font-medium uppercase tracking-wider text-gray-600">
               <th className="px-5 py-3">{t("companyName")}</th>
               <th className="px-5 py-3">{t("contactPerson")}</th>
               <th className="px-5 py-3">{t("email")}</th>
@@ -64,17 +64,17 @@ export function ContactsContent({
               <th className="px-5 py-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-surface-100">
+          <tbody className="divide-y divide-gray-300">
             {contacts.map((contact) => (
-              <tr key={contact.id} className="transition-colors hover:bg-surface-50">
-                <td className="px-5 py-3.5 font-medium text-surface-900">{contact.companyName}</td>
-                <td className="px-5 py-3.5 text-surface-700">{contact.contactName}</td>
-                <td className="px-5 py-3.5 text-sm text-surface-500">{contact.email}</td>
-                <td className="px-5 py-3.5 text-sm text-surface-600">{contact.addressCity}</td>
+              <tr key={contact.id} className="hover:bg-gray-50">
+                <td className="px-5 py-3.5 font-medium text-black">{contact.companyName}</td>
+                <td className="px-5 py-3.5 text-black">{contact.contactName}</td>
+                <td className="px-5 py-3.5 text-sm text-gray-600">{contact.email}</td>
+                <td className="px-5 py-3.5 text-sm text-gray-600">{contact.addressCity}</td>
                 <td className="px-5 py-3.5 text-right">
                   <Link
                     href={`/contacts/${contact.id}/edit`}
-                    className="mr-3 text-sm font-medium text-primary-600 hover:text-primary-700"
+                    className="mr-3 text-sm font-medium text-[#0000cc] hover:text-[#000099]"
                   >
                     {t("edit")}
                   </Link>
@@ -90,7 +90,7 @@ export function ContactsContent({
             ))}
             {contacts.length === 0 && (
               <tr>
-                <td colSpan={5} className="py-12 text-center text-surface-400">
+                <td colSpan={5} className="py-12 text-center text-gray-500">
                   {t("contactsEmpty")}
                 </td>
               </tr>

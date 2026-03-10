@@ -30,8 +30,8 @@ export function SettingsContent({
 
   return (
     <div className="max-w-lg">
-      <h1 className="mb-6 text-2xl font-bold text-surface-900">{t("settings")}</h1>
-      <div className="rounded-xl border border-surface-200 bg-white p-6 shadow-sm">
+      <h1 className="mb-6 text-2xl font-bold text-black">{t("settings")}</h1>
+      <div className="border border-black bg-white p-6">
         <form
           action={(formData) => startTransition(() => saveAction(formData))}
           className="space-y-5"
@@ -77,7 +77,7 @@ export function SettingsContent({
             defaultValue={settings.invoicePrefix}
           />
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-surface-700">
+            <label className="mb-1.5 block text-sm font-medium text-black">
               {t("defaultBtwRate")}
             </label>
             <select
@@ -96,14 +96,14 @@ export function SettingsContent({
               id="korActive"
               name="korActive"
               defaultChecked={settings.korActive}
-              className="h-4 w-4 rounded border-surface-300 text-primary-600 focus:ring-primary-500"
+              className="h-4 w-4 border-black text-black"
             />
-            <label htmlFor="korActive" className="text-sm text-surface-700">
+            <label htmlFor="korActive" className="text-sm text-black">
               {t("korActive")}
             </label>
           </div>
 
-          <div className="border-t border-surface-100 pt-5">
+          <div className="border-t border-gray-300 pt-5">
             <Button type="submit" loading={pending}>
               {t("save")}
             </Button>

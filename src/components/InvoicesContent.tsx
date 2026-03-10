@@ -43,10 +43,10 @@ export function InvoicesContent({ invoices }: { invoices: Invoice[] }) {
         <LinkButton href="/invoices/new">{t("newInvoice")}</LinkButton>
       </PageHeader>
 
-      <div className="overflow-hidden rounded-xl border border-surface-200 bg-white shadow-sm">
+      <div className="border border-black bg-white">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-surface-200 bg-surface-50 text-left text-xs font-medium uppercase tracking-wider text-surface-500">
+            <tr className="border-b border-black bg-gray-100 text-left text-xs uppercase text-black">
               <th className="px-5 py-3">{t("invoiceNumber")}</th>
               <th className="px-5 py-3">{t("customer")}</th>
               <th className="px-5 py-3">{t("date")}</th>
@@ -56,16 +56,16 @@ export function InvoicesContent({ invoices }: { invoices: Invoice[] }) {
               <th className="px-5 py-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-surface-100">
+          <tbody className="divide-y divide-gray-300">
             {invoices.map((inv) => (
-              <tr key={inv.id} className="transition-colors hover:bg-surface-50">
-                <td className="px-5 py-3.5 font-mono text-sm text-surface-900">{inv.invoiceNumber}</td>
-                <td className="px-5 py-3.5 font-medium text-surface-700">{inv.companyName}</td>
-                <td className="px-5 py-3.5 text-sm text-surface-600">{formatDate(inv.issueDate)}</td>
-                <td className="px-5 py-3.5 text-sm text-surface-600">
+              <tr key={inv.id} className="hover:bg-gray-50">
+                <td className="px-5 py-3.5 font-mono text-sm text-black">{inv.invoiceNumber}</td>
+                <td className="px-5 py-3.5 font-medium text-black">{inv.companyName}</td>
+                <td className="px-5 py-3.5 text-sm text-gray-600">{formatDate(inv.issueDate)}</td>
+                <td className="px-5 py-3.5 text-sm text-gray-600">
                   {inv.dueDate ? formatDate(inv.dueDate) : "-"}
                 </td>
-                <td className="px-5 py-3.5 text-right font-mono text-sm text-surface-900">
+                <td className="px-5 py-3.5 text-right font-mono text-sm text-black">
                   {inv.totalCents != null ? formatCurrency(inv.totalCents) : "-"}
                 </td>
                 <td className="px-5 py-3.5">
@@ -78,7 +78,7 @@ export function InvoicesContent({ invoices }: { invoices: Invoice[] }) {
                 <td className="px-5 py-3.5 text-right">
                   <Link
                     href={`/invoices/${inv.id}`}
-                    className="text-sm font-medium text-primary-600 hover:text-primary-700"
+                    className="text-sm font-medium text-[#0000cc] underline hover:text-[#000099]"
                   >
                     {t("view")}
                   </Link>
@@ -87,7 +87,7 @@ export function InvoicesContent({ invoices }: { invoices: Invoice[] }) {
             ))}
             {invoices.length === 0 && (
               <tr>
-                <td colSpan={7} className="py-12 text-center text-surface-400">
+                <td colSpan={7} className="py-12 text-center text-gray-500">
                   {t("invoicesEmpty")}
                 </td>
               </tr>

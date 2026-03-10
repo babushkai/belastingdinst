@@ -1,5 +1,5 @@
 const inputClass =
-  "w-full rounded-lg border border-surface-300 bg-white px-3.5 py-2.5 text-sm text-surface-900 shadow-sm transition-colors placeholder:text-surface-400 hover:border-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none";
+  "w-full border border-black bg-white px-2 py-1.5 text-sm text-black placeholder:text-gray-500 focus:outline focus:outline-2 focus:outline-[#0000cc] focus:outline-offset-0";
 
 interface FieldProps {
   name: string;
@@ -22,7 +22,7 @@ export function Field({
     <div>
       <label
         htmlFor={name}
-        className="mb-1.5 block text-sm font-medium text-surface-700"
+        className="mb-1 block text-sm text-black"
       >
         {label}
       </label>
@@ -32,9 +32,9 @@ export function Field({
         type={type}
         required={required}
         defaultValue={defaultValue}
-        className={`${inputClass} ${error ? "border-red-400 focus:border-red-500 focus:ring-red-500/20" : ""}`}
+        className={`${inputClass} ${error ? "border-red-700" : ""}`}
       />
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-xs text-red-700">{error}</p>}
     </div>
   );
 }

@@ -24,8 +24,8 @@ export function ContactForm({ title, action, defaults = {} }: ContactFormProps) 
 
   return (
     <div className="max-w-lg">
-      <h1 className="mb-6 text-2xl font-bold text-surface-900">{t(title)}</h1>
-      <div className="rounded-xl border border-surface-200 bg-white p-6 shadow-sm">
+      <h1 className="mb-6 text-2xl font-bold text-black">{t(title)}</h1>
+      <div className="border border-black bg-white p-6">
         <form action={action} className="space-y-5">
           <Field
             name="companyName"
@@ -72,7 +72,7 @@ export function ContactForm({ title, action, defaults = {} }: ContactFormProps) 
             />
           </div>
 
-          <div className="flex gap-3 border-t border-surface-100 pt-5">
+          <div className="flex gap-3 border-t border-gray-300 pt-5">
             <Button type="submit">{t("save")}</Button>
             <LinkButton href="/contacts" variant="secondary">
               {t("cancel")}

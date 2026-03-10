@@ -50,20 +50,20 @@ export function BtwPrintView({ period: p, btwNumber, companyName }: BtwPrintView
     : null;
 
   return (
-    <div className="mx-auto max-w-2xl p-8 font-sans text-sm text-gray-900">
+    <div className="mx-auto max-w-2xl p-8 text-sm text-gray-900">
       {/* Print button — hidden when printing */}
       <div className="mb-4 print:hidden">
         <button
           type="button"
           onClick={() => window.print()}
-          className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
+          className="border border-black bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black hover:text-white"
         >
           Afdrukken / Opslaan als PDF
         </button>
       </div>
 
       {/* Header */}
-      <div className="mb-6 border-b-2 border-gray-800 pb-4">
+      <div className="mb-6 border-b-2 border-black pb-4">
         <h1 className="text-xl font-bold">BTW-aangifte Q{p.periodNumber} {p.year}</h1>
         <p className="mt-1 text-gray-600">Aangiftetijdvak: {dateRange}</p>
       </div>
@@ -87,7 +87,7 @@ export function BtwPrintView({ period: p, btwNumber, companyName }: BtwPrintView
       {/* Rubrieken table */}
       <table className="mb-6 w-full border-collapse">
         <thead>
-          <tr className="border-b-2 border-gray-300 text-left text-xs font-semibold uppercase text-gray-500">
+          <tr className="border-b-2 border-black text-left text-xs font-semibold uppercase text-gray-500">
             <th className="pb-2 pr-4">Rubriek</th>
             <th className="pb-2 pr-4">Omschrijving</th>
             <th className="pb-2 pr-4 text-right">Omzet</th>
@@ -96,7 +96,7 @@ export function BtwPrintView({ period: p, btwNumber, companyName }: BtwPrintView
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.code} className="border-b border-gray-200">
+            <tr key={row.code} className="border-b border-black">
               <td className="py-2 pr-4 font-mono font-semibold">{row.code}</td>
               <td className="py-2 pr-4">{row.desc}</td>
               <td className="py-2 pr-4 text-right font-mono">
@@ -107,7 +107,7 @@ export function BtwPrintView({ period: p, btwNumber, companyName }: BtwPrintView
               </td>
             </tr>
           ))}
-          <tr className="border-t-2 border-gray-800 font-bold">
+          <tr className="border-t-2 border-black font-bold">
             <td className="py-2 pr-4 font-mono">5g</td>
             <td className="py-2 pr-4">Totaal te betalen / terug te ontvangen</td>
             <td className="py-2 pr-4"></td>
@@ -120,7 +120,7 @@ export function BtwPrintView({ period: p, btwNumber, companyName }: BtwPrintView
 
       {/* Filing status */}
       {p.status === "filed" && (
-        <div className="mb-6 rounded border border-gray-300 bg-gray-50 p-3 text-sm">
+        <div className="mb-6border border-black bg-white p-3 text-sm">
           <p>
             <span className="font-semibold">Status:</span> Ingediend
             {filedDate && ` op ${filedDate}`}
@@ -135,7 +135,7 @@ export function BtwPrintView({ period: p, btwNumber, companyName }: BtwPrintView
       )}
 
       {/* Footer */}
-      <div className="border-t border-gray-300 pt-3 text-xs text-gray-400">
+      <div className="border-t border-black pt-3 text-xs text-gray-400">
         Gegenereerd door Belastingdinst op{" "}
         {new Date().toLocaleDateString("nl-NL", {
           day: "numeric",

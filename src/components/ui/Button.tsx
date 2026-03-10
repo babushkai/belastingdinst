@@ -2,22 +2,22 @@ import { forwardRef } from "react";
 import Link from "next/link";
 
 const base =
-  "inline-flex items-center justify-center font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center font-medium disabled:pointer-events-none disabled:opacity-50";
 
 const variants = {
   primary:
-    "rounded-lg bg-primary-600 text-white shadow-md shadow-primary-600/25 hover:bg-primary-700 hover:shadow-lg",
+    "border border-black bg-black text-white hover:bg-white hover:text-black",
   secondary:
-    "rounded-lg border border-surface-300 bg-white text-surface-700 shadow-sm hover:bg-surface-50 hover:text-surface-900",
+    "border border-black bg-white text-black hover:bg-black hover:text-white",
   danger:
-    "rounded-lg bg-red-600 text-white shadow-md shadow-red-600/25 hover:bg-red-700",
+    "border border-red-700 bg-white text-red-700 hover:bg-red-700 hover:text-white",
   ghost:
-    "rounded-lg text-surface-500 hover:bg-surface-100 hover:text-surface-700",
+    "border border-transparent text-black hover:border-black",
 } as const;
 
 const sizes = {
-  sm: "px-3 py-1.5 text-xs gap-1.5",
-  md: "px-4 py-2.5 text-sm gap-2",
+  sm: "px-2 py-1 text-xs gap-1",
+  md: "px-3 py-2 text-sm gap-1.5",
 } as const;
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -71,7 +71,7 @@ export function LinkButton({
   return (
     <Link
       href={href}
-      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`${base} ${variants[variant]} ${sizes[size]} ${className} no-underline`}
     >
       {children}
     </Link>

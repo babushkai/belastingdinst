@@ -140,14 +140,14 @@ export default function NewInvoicePage() {
   }
 
   const lineInputClass =
-    "w-full rounded-lg border border-surface-300 px-2.5 py-1.5 text-sm shadow-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none";
+    "w-full border border-black px-2 py-1.5 text-sm focus:outline focus:outline-2 focus:outline-[#0000cc]";
 
   return (
     <div className="max-w-3xl">
-      <h1 className="mb-6 text-2xl font-bold text-surface-900">{t("newInvoice")}</h1>
+      <h1 className="mb-6 text-2xl font-bold text-black">{t("newInvoice")}</h1>
 
       {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div className="mb-4 border border-red-700 bg-white p-3 text-sm text-red-700">
           {error}
         </div>
       )}
@@ -155,7 +155,7 @@ export default function NewInvoicePage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Contact search */}
         <div className="relative">
-          <label className="mb-1.5 block text-sm font-medium text-surface-700">{t("customer")}</label>
+          <label className="mb-1.5 block text-sm font-medium text-black">{t("customer")}</label>
           <input
             type="text"
             placeholder={t("searchContactPlaceholder")}
@@ -165,15 +165,15 @@ export default function NewInvoicePage() {
             className={inputClass}
           />
           {contacts.length > 0 && !contactId && (
-            <ul className="absolute z-10 mt-1 w-full rounded-lg border border-surface-200 bg-white shadow-lg">
+            <ul className="absolute z-10 mt-1 w-full border border-black bg-white">
               {contacts.map((c, i) => (
                 <li key={c.id}>
                   <button
                     type="button"
-                    className={`w-full px-3.5 py-2.5 text-left text-sm transition-colors ${
+                    className={`w-full px-3.5 py-2.5 text-left text-sm ${
                       i === highlightIdx
-                        ? "bg-primary-50 text-primary-700"
-                        : "text-surface-700 hover:bg-surface-50"
+                        ? "bg-gray-100 text-black"
+                        : "text-black hover:bg-gray-50"
                     }`}
                     onClick={() => selectContact(c)}
                   >
@@ -188,7 +188,7 @@ export default function NewInvoicePage() {
         {/* Dates */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-surface-700">{t("issueDate")}</label>
+            <label className="mb-1.5 block text-sm font-medium text-black">{t("issueDate")}</label>
             <input
               type="date"
               value={issueDate}
@@ -198,7 +198,7 @@ export default function NewInvoicePage() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-surface-700">{t("dueDate")}</label>
+            <label className="mb-1.5 block text-sm font-medium text-black">{t("dueDate")}</label>
             <input
               type="date"
               value={dueDate}
@@ -209,11 +209,11 @@ export default function NewInvoicePage() {
         </div>
 
         {/* Invoice lines */}
-        <div className="rounded-xl border border-surface-200 bg-white p-5 shadow-sm">
-          <h2 className="mb-3 text-sm font-semibold text-surface-800">{t("lines")}</h2>
+        <div className="border border-black bg-white p-5">
+          <h2 className="mb-3 text-sm font-semibold text-black">{t("lines")}</h2>
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs font-medium uppercase tracking-wider text-surface-500">
+              <tr className="text-left text-xs font-medium uppercase tracking-wider text-gray-600">
                 <th className="pb-2">{t("description")}</th>
                 <th className="pb-2 w-20">{t("quantity")}</th>
                 <th className="pb-2 w-28">{t("unitPriceCents")}</th>
@@ -251,7 +251,7 @@ export default function NewInvoicePage() {
                   </td>
                   <td className="py-1.5 pr-2">
                     <div className="relative">
-                      <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-surface-400">
+                      <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-gray-500">
                         &euro;
                       </span>
                       <input
@@ -284,7 +284,7 @@ export default function NewInvoicePage() {
                       <option value={0}>0%</option>
                     </select>
                   </td>
-                  <td className="py-1.5 text-right font-mono text-surface-700">
+                  <td className="py-1.5 text-right font-mono text-black">
                     {formatCurrency(calcLineTotal(line).total)}
                   </td>
                   <td className="py-1.5 text-right">
@@ -292,7 +292,7 @@ export default function NewInvoicePage() {
                       <button
                         type="button"
                         onClick={() => removeLine(idx)}
-                        className="text-surface-400 transition-colors hover:text-red-600"
+                        className="text-gray-500 hover:text-red-600"
                       >
                         <IconTrash className="h-4 w-4" />
                       </button>
@@ -305,23 +305,23 @@ export default function NewInvoicePage() {
           <button
             type="button"
             onClick={addLine}
-            className="mt-3 text-sm font-medium text-primary-600 hover:text-primary-700"
+            className="mt-3 text-sm font-medium text-[#0000cc] hover:text-[#000099]"
           >
             + {t("addLine")}
           </button>
         </div>
 
         {/* Totals */}
-        <div className="rounded-xl border border-surface-200 bg-white p-5 text-sm shadow-sm">
-          <div className="flex justify-between text-surface-600">
+        <div className="border border-black bg-white p-5 text-sm">
+          <div className="flex justify-between text-gray-600">
             <span>{t("subtotal")}</span>
             <span className="font-mono">{formatCurrency(totals.subtotal)}</span>
           </div>
-          <div className="flex justify-between text-surface-600">
+          <div className="flex justify-between text-gray-600">
             <span>{t("btw")}</span>
             <span className="font-mono">{formatCurrency(totals.btw)}</span>
           </div>
-          <div className="flex justify-between border-t border-surface-200 pt-2 font-bold text-surface-900">
+          <div className="flex justify-between border-t border-black pt-2 font-bold text-black">
             <span>{t("total")}</span>
             <span className="font-mono">{formatCurrency(totals.total)}</span>
           </div>
@@ -329,7 +329,7 @@ export default function NewInvoicePage() {
 
         {/* Notes */}
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-surface-700">{t("notes")}</label>
+          <label className="mb-1.5 block text-sm font-medium text-black">{t("notes")}</label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
