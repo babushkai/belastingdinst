@@ -292,6 +292,36 @@ export const translations = {
     en: "computed by the portal",
   },
   revenue0: { nl: "Omzet 0%", en: "Revenue 0%" },
+  copyAll: { nl: "Kopieer alles", en: "Copy all" },
+  openPortal: {
+    nl: "Open Mijn Belastingdienst",
+    en: "Open Mijn Belastingdienst",
+  },
+  confirmationNumber: {
+    nl: "Betalingskenmerk",
+    en: "Payment reference",
+  },
+  confirmationNumberPlaceholder: {
+    nl: "Bijv. NL12345678901 (optioneel)",
+    en: "e.g. NL12345678901 (optional)",
+  },
+  filedOn: { nl: "Ingediend op", en: "Filed on" },
+  confirmAndLock: {
+    nl: "Bevestig & vergrendel",
+    en: "Confirm & lock",
+  },
+  filingConfirmTitle: {
+    nl: "Aangifte ingediend?",
+    en: "Return filed?",
+  },
+  filingConfirmDescription: {
+    nl: "Bevestig dat je de aangifte hebt ingediend bij de Belastingdienst. De periode wordt hierna vergrendeld.",
+    en: "Confirm that you have filed the return with the Belastingdienst. The period will be locked after this.",
+  },
+  printSummary: {
+    nl: "Print overzicht",
+    en: "Print summary",
+  },
 
   // ── Settings ──
   settings: { nl: "Instellingen", en: "Settings" },

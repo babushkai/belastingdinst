@@ -37,6 +37,7 @@ export const btwPeriods = pgTable(
     btwLaagCents: integer("btw_laag_cents").notNull().default(0),
     btwInkoopCents: integer("btw_inkoop_cents").notNull().default(0),
     btwTeBetalen: integer("btw_te_betalen_cents").notNull().default(0),
+    confirmationNumber: text("confirmation_number"),
     filedAt: timestamp("filed_at"),
     pdfPath: text("pdf_path"),
     notes: text("notes"),

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatCurrency, centsToEuros, eurosToCents, centsToWholeEuros, formatDate } from "../format";
+import { formatCurrency, centsToEuros, eurosToCents, centsToWholeEuros, formatDate, buildCopyAllText } from "../format";
 
 describe("formatCurrency", () => {
   it("formats positive cents to EUR", () => {
@@ -58,6 +58,68 @@ describe("centsToWholeEuros", () => {
   it("truncates down, not rounds up", () => {
     expect(centsToWholeEuros(99)).toBe("0");
     expect(centsToWholeEuros(150)).toBe("1");
+  });
+});
+
+describe("buildCopyAllText", () => {
+  it("formats all rubrieken with correct values", () => {
+    const result = buildCopyAllText({
+      periodNumber: 1,
+      year: 2026,
+      omzetHoogCents: 1000000,
+      omzetLaagCents: 500000,
+      omzetNulCents: 200000,
+      btwHoogCents: 210000,
+      btwLaagCents: 45000,
+      btwInkoopCents: 50000,
+      btwTeBetalen: 205000,
+    });
+
+    expect(result).toBe(
+      [
+        "BTW-aangifte Q1 2026",
+        "1a Omzet 21%: 10000",
+        "1a BTW 21%:   2100",
+        "1b Omzet 9%:  5000",
+        "1b BTW 9%:    450",
+        "1e Omzet 0%:  2000",
+        "5b Voorbelasting: 500",
+        "Te betalen: 2050",
+      ].join("\n"),
+    );
+  });
+
+  it("handles zero amounts", () => {
+    const result = buildCopyAllText({
+      periodNumber: 3,
+      year: 2025,
+      omzetHoogCents: 500000,
+      omzetLaagCents: 0,
+      omzetNulCents: 0,
+      btwHoogCents: 105000,
+      btwLaagCents: 0,
+      btwInkoopCents: 0,
+      btwTeBetalen: 0,
+    });
+
+    expect(result).toContain("BTW-aangifte Q3 2025");
+    expect(result).toContain("Te betalen: 0");
+  });
+
+  it("handles negative te betalen (refund) as absolute value", () => {
+    const result = buildCopyAllText({
+      periodNumber: 4,
+      year: 2025,
+      omzetHoogCents: 100000,
+      omzetLaagCents: 0,
+      omzetNulCents: 0,
+      btwHoogCents: 21000,
+      btwLaagCents: 0,
+      btwInkoopCents: 50000,
+      btwTeBetalen: -29000,
+    });
+
+    expect(result).toContain("Terug te ontvangen: 290");
   });
 });
 

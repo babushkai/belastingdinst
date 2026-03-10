@@ -95,13 +95,20 @@ export async function saveBtwPeriod(
 }
 
 /**
- * Lock and file a BTW period. Uses atomic conditional update.
+ * Lock and file a BTW period with optional confirmation number.
+ * Atomic conditional update — only succeeds if not already locked.
  */
 export async function lockAndFilePeriod(
   periodId: string,
+  confirmationNumber?: string,
 ): Promise<{ error?: string; locked?: true }> {
   try {
     await requireAuth();
+
+    const trimmed = confirmationNumber?.trim() || null;
+    if (trimmed && trimmed.length > 50) {
+      return { error: "Betalingskenmerk te lang (max 50 tekens)" };
+    }
 
     // Atomic: only update if not already locked
     const result = await db
@@ -110,6 +117,7 @@ export async function lockAndFilePeriod(
         locked: true,
         status: "filed",
         filedAt: new Date(),
+        confirmationNumber: trimmed,
         updatedAt: new Date(),
       })
       .where(

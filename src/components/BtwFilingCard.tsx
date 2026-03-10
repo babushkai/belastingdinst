@@ -2,10 +2,12 @@
 
 import { useState, useCallback } from "react";
 import { useI18n } from "@/lib/i18n";
-import { formatCurrency, centsToWholeEuros } from "@/lib/format";
+import { formatCurrency, centsToWholeEuros, buildCopyAllText } from "@/lib/format";
+import { BELASTINGDIENST_OB_URL } from "@/lib/config";
 
 interface BtwFilingCardProps {
   period: {
+    id: string;
     periodNumber: number;
     year: number;
     status: string;
@@ -17,9 +19,12 @@ interface BtwFilingCardProps {
     btwLaagCents: number;
     btwInkoopCents: number;
     btwTeBetalen: number;
+    confirmationNumber: string | null;
+    filedAt: string | null;
   };
   btwNumber: string | null;
   korActive: boolean;
+  onFileClick?: () => void;
 }
 
 /** Official Belastingdienst rubrieken — these are regulatory codes, not translated */
@@ -51,7 +56,6 @@ function CopyButton({ value, label }: { value: string; label: string }) {
         document.body.removeChild(textarea);
         setCopied(true);
       } catch {
-        // Both methods failed — don't show false confirmation
         return;
       }
     }
@@ -70,7 +74,7 @@ function CopyButton({ value, label }: { value: string; label: string }) {
   );
 }
 
-export function BtwFilingCard({ period, btwNumber, korActive }: BtwFilingCardProps) {
+export function BtwFilingCard({ period, btwNumber, korActive, onFileClick }: BtwFilingCardProps) {
   const { t } = useI18n();
   const p = period;
 
@@ -82,13 +86,20 @@ export function BtwFilingCard({ period, btwNumber, korActive }: BtwFilingCardPro
 
   const isKorApplied = korActive && p.btwTeBetalen === 0 && (p.omzetHoogCents + p.omzetLaagCents + p.omzetNulCents) > 0;
 
-  // Rubriek data: [code, description, omzet cents, btw cents]
   const rows: { code: string; desc: string; omzetCents: number | null; btwCents: number | null }[] = [
     { code: "1a", desc: RUBRIEKEN[0].desc, omzetCents: p.omzetHoogCents, btwCents: p.btwHoogCents },
     { code: "1b", desc: RUBRIEKEN[1].desc, omzetCents: p.omzetLaagCents, btwCents: p.btwLaagCents },
     { code: "1e", desc: RUBRIEKEN[2].desc, omzetCents: p.omzetNulCents, btwCents: null },
     { code: "5b", desc: RUBRIEKEN[3].desc, omzetCents: null, btwCents: p.btwInkoopCents },
   ];
+
+  const filedDate = p.filedAt
+    ? new Date(p.filedAt).toLocaleDateString("nl-NL", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : null;
 
   return (
     <div className="rounded-xl border border-surface-200 bg-white p-5 shadow-sm">
@@ -99,6 +110,17 @@ export function BtwFilingCard({ period, btwNumber, korActive }: BtwFilingCardPro
             {t("filingCard")} — {periodLabel}
           </h3>
           <p className="mt-0.5 text-sm text-surface-500">{dateRange}</p>
+          {/* Filed status with confirmation number */}
+          {p.status === "filed" && filedDate && (
+            <p className="mt-1 text-sm text-emerald-600">
+              {t("filedOn")} {filedDate}
+              {p.confirmationNumber && (
+                <span className="ml-2 font-mono text-surface-600">
+                  — {t("confirmationNumber")}: {p.confirmationNumber}
+                </span>
+              )}
+            </p>
+          )}
         </div>
         <div className="text-right text-sm">
           <div className="text-surface-500">{t("btwNumberLabel")}</div>
@@ -118,6 +140,43 @@ export function BtwFilingCard({ period, btwNumber, korActive }: BtwFilingCardPro
           {t("korActiveNotice")}
         </div>
       )}
+
+      {/* Action bar: Copy All + Open Portal + Print */}
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <CopyButton
+          value={buildCopyAllText(p)}
+          label={t("copyAll")}
+        />
+        <a
+          href={BELASTINGDIENST_OB_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700"
+        >
+          {t("openPortal")}
+          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        </a>
+        <a
+          href={`/btw/${p.id}/print`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded px-2.5 py-1 text-xs font-medium text-surface-500 transition-colors hover:bg-surface-100 hover:text-surface-700"
+        >
+          {t("printSummary")}
+        </a>
+        {/* File button inside the card for unfiled periods */}
+        {!p.locked && p.status === "calculated" && onFileClick && (
+          <button
+            type="button"
+            onClick={onFileClick}
+            className="ml-auto rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-700"
+          >
+            {t("submit")}
+          </button>
+        )}
+      </div>
 
       {/* Rubrieken table */}
       <table className="w-full">
