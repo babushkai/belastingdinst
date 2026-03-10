@@ -1,0 +1,1 @@
+ALTER TABLE "btw_periods" ADD COLUMN "confirmation_number" text;

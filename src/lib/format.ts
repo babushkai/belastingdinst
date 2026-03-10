@@ -38,6 +38,33 @@ export function centsToWholeEuros(cents: number): string {
   return String(Math.trunc(Math.abs(cents) / 100));
 }
 
+/** Build plain-text BTW summary for clipboard — matches portal field order */
+export function buildCopyAllText(period: {
+  periodNumber: number;
+  year: number;
+  omzetHoogCents: number;
+  omzetLaagCents: number;
+  omzetNulCents: number;
+  btwHoogCents: number;
+  btwLaagCents: number;
+  btwInkoopCents: number;
+  btwTeBetalen: number;
+}): string {
+  const p = period;
+  return [
+    `BTW-aangifte Q${p.periodNumber} ${p.year}`,
+    `1a Omzet 21%: ${centsToWholeEuros(p.omzetHoogCents)}`,
+    `1a BTW 21%:   ${centsToWholeEuros(p.btwHoogCents)}`,
+    `1b Omzet 9%:  ${centsToWholeEuros(p.omzetLaagCents)}`,
+    `1b BTW 9%:    ${centsToWholeEuros(p.btwLaagCents)}`,
+    `1e Omzet 0%:  ${centsToWholeEuros(p.omzetNulCents)}`,
+    `5b Voorbelasting: ${centsToWholeEuros(p.btwInkoopCents)}`,
+    p.btwTeBetalen < 0
+      ? `Terug te ontvangen: ${centsToWholeEuros(p.btwTeBetalen)}`
+      : `Te betalen: ${centsToWholeEuros(p.btwTeBetalen)}`,
+  ].join("\n");
+}
+
 export function formatRelativeDate(dateStr: string): string {
   const now = new Date();
   const date = new Date(dateStr.includes("T") ? dateStr : dateStr + "T00:00:00");

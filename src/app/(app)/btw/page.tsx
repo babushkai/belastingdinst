@@ -40,6 +40,8 @@ export default async function BtwPage() {
         btwLaagCents: p.btwLaagCents,
         btwInkoopCents: p.btwInkoopCents,
         btwTeBetalen: p.btwTeBetalen,
+        confirmationNumber: p.confirmationNumber ?? null,
+        filedAt: p.filedAt?.toISOString() ?? null,
       }))}
       currentYear={currentYear}
       currentQuarter={currentQuarter}

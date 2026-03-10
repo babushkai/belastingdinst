@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/Badge";
 import { BtwFilingCard } from "@/components/BtwFilingCard";
 import { formatCurrency } from "@/lib/format";
 
-interface BtwPeriod {
+export interface BtwPeriod {
   id: string;
   periodNumber: number;
   year: number;
@@ -23,6 +23,8 @@ interface BtwPeriod {
   btwLaagCents: number;
   btwInkoopCents: number;
   btwTeBetalen: number;
+  confirmationNumber: string | null;
+  filedAt: string | null;
 }
 
 const TABLE_COLS = 8;
@@ -52,6 +54,7 @@ interface BtwContentProps {
   ) => Promise<{ error?: string; locked?: true }>;
   fileAction: (
     periodId: string,
+    confirmationNumber?: string,
   ) => Promise<{ error?: string; locked?: true }>;
 }
 
@@ -69,10 +72,13 @@ export function BtwContent({
   const { t } = useI18n();
   const [error, setError] = useState<string | null>(null);
   const [calculating, setCalculating] = useState(false);
-  const [filingId, setFilingId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [selectedQuarter, setSelectedQuarter] = useState(currentQuarter);
+  // Confirmation modal state
+  const [confirmingPeriodId, setConfirmingPeriodId] = useState<string | null>(null);
+  const [confirmationNumber, setConfirmationNumber] = useState("");
+  const [filing, setFiling] = useState(false);
 
   const lockedSet = useMemo(() => new Set(lockedPeriodKeys), [lockedPeriodKeys]);
 
@@ -100,6 +106,22 @@ export function BtwContent({
     setSelectedYear(year);
     if (year === currentYear && selectedQuarter > currentQuarter) {
       setSelectedQuarter(currentQuarter);
+    }
+  }
+
+  async function handleConfirmFiling() {
+    if (!confirmingPeriodId) return;
+    setFiling(true);
+    setError(null);
+    const result = await fileAction(confirmingPeriodId, confirmationNumber || undefined);
+    setFiling(false);
+    if (result.error) {
+      setError(result.error);
+    } else if (result.locked) {
+      setError("Deze periode is al vergrendeld.");
+    } else {
+      setConfirmingPeriodId(null);
+      setConfirmationNumber("");
     }
   }
 
@@ -214,25 +236,16 @@ export function BtwContent({
                     </td>
                     <td className="px-5 py-3.5 text-right">
                       {!p.locked && p.status === "calculated" && (
-                        <form
-                          className="inline"
-                          action={async () => {
-                            setFilingId(p.id);
-                            setError(null);
-                            const result = await fileAction(p.id);
-                            if (result.error) setError(result.error);
-                            setFilingId(null);
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setConfirmingPeriodId(p.id);
                           }}
-                          onClick={(e) => e.stopPropagation()}
+                          className="text-sm font-medium text-primary-600 hover:text-primary-700"
                         >
-                          <button
-                            type="submit"
-                            disabled={filingId !== null}
-                            className="text-sm font-medium text-primary-600 hover:text-primary-700 disabled:opacity-50"
-                          >
-                            {filingId === p.id ? "..." : t("submit")}
-                          </button>
-                        </form>
+                          {t("submit")}
+                        </button>
                       )}
                       {canExpand && (
                         <span className="ml-2 text-xs text-surface-400">
@@ -249,6 +262,7 @@ export function BtwContent({
                             period={p}
                             btwNumber={btwNumber}
                             korActive={korActive}
+                            onFileClick={() => setConfirmingPeriodId(p.id)}
                           />
                         </div>
                       </td>
@@ -272,6 +286,70 @@ export function BtwContent({
         <p className="font-semibold text-surface-800">{t("manualFiling")}</p>
         <p className="mt-1">{t("manualFilingDescription")}</p>
       </div>
+
+      {/* Confirmation modal */}
+      {confirmingPeriodId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+          onClick={() => {
+            if (!filing) {
+              setConfirmingPeriodId(null);
+              setConfirmationNumber("");
+            }
+          }}
+        >
+          <div
+            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold text-surface-900">
+              {t("filingConfirmTitle")}
+            </h3>
+            <p className="mt-2 text-sm text-surface-600">
+              {t("filingConfirmDescription")}
+            </p>
+
+            <div className="mt-4">
+              <label
+                htmlFor="confirmation-number"
+                className="block text-sm font-medium text-surface-700"
+              >
+                {t("confirmationNumber")}
+              </label>
+              <input
+                id="confirmation-number"
+                type="text"
+                value={confirmationNumber}
+                onChange={(e) => setConfirmationNumber(e.target.value)}
+                placeholder={t("confirmationNumberPlaceholder")}
+                className="mt-1 w-full rounded-lg border border-surface-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              />
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setConfirmingPeriodId(null);
+                  setConfirmationNumber("");
+                }}
+                disabled={filing}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-surface-600 hover:bg-surface-100 disabled:opacity-50"
+              >
+                {t("cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmFiling}
+                disabled={filing}
+                className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 disabled:opacity-50"
+              >
+                {filing ? "..." : t("confirmAndLock")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

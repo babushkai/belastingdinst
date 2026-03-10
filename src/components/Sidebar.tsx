@@ -39,7 +39,7 @@ export function Sidebar({
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-60 flex-col bg-surface-950 text-surface-300">
+    <aside className="flex w-60 flex-col bg-surface-950 text-surface-300 print:hidden">
       {/* Brand */}
       <div className="flex items-center gap-2.5 border-b border-surface-800 px-5 py-4">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600 text-sm font-bold text-white">
