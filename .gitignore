@@ -42,6 +42,9 @@ backups/
 *.swp
 *.swo
 
+# claude code
+.claude/
+
 # drizzle (keep meta/ — required for production migrations)
 
 # uploads
