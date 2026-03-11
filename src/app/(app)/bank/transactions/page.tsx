@@ -27,6 +27,7 @@ export default async function TransactionsPage() {
         counterpartyName: tx.counterpartyName,
         description: tx.description,
         importSource: tx.importSource,
+        btwCode: tx.btwCode,
       }))}
     />
   );

@@ -323,6 +323,23 @@ export const translations = {
     en: "Print summary",
   },
 
+  // ── Invoice Detail ──
+  editInvoice: { nl: "Factuur bewerken", en: "Edit invoice" },
+  saveInvoice: { nl: "Factuur opslaan", en: "Save invoice" },
+  downloadPdf: { nl: "Download PDF", en: "Download PDF" },
+
+  // ── Reports ──
+  navReports: { nl: "Winst & Verlies", en: "Profit & Loss" },
+  pnlTitle: { nl: "Winst & Verlies", en: "Profit & Loss" },
+  revenueExVat: { nl: "Omzet (excl. BTW)", en: "Revenue (excl. VAT)" },
+  expensesExVat: { nl: "Kosten (excl. BTW)", en: "Expenses (excl. VAT)" },
+  grossProfit: { nl: "Brutowinst", en: "Gross profit" },
+  quarterlyBreakdown: { nl: "Per kwartaal", en: "Quarterly breakdown" },
+  uncategorisedWarning: {
+    nl: "uitgaande transacties zonder BTW-code — categoriseer ze voor een accuraat overzicht.",
+    en: "outgoing transactions without VAT code — categorise them for an accurate overview.",
+  },
+
   // ── Settings ──
   settings: { nl: "Instellingen", en: "Settings" },
   iban: { nl: "IBAN", en: "IBAN" },
