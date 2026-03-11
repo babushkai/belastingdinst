@@ -11,6 +11,7 @@ import {
   IconInvoices,
   IconBank,
   IconBtw,
+  IconReports,
   IconSettings,
   IconSignOut,
 } from "@/components/ui/icons";
@@ -25,6 +26,7 @@ const navItems: {
   { href: "/invoices", labelKey: "navInvoices", icon: IconInvoices },
   { href: "/bank", labelKey: "navBank", icon: IconBank },
   { href: "/btw", labelKey: "navBtw", icon: IconBtw },
+  { href: "/reports/pnl", labelKey: "navReports", icon: IconReports },
   { href: "/settings", labelKey: "navSettings", icon: IconSettings },
 ];
 

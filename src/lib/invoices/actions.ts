@@ -61,6 +61,8 @@ export async function createInvoice(input: z.infer<typeof CreateInvoiceSchema>) 
   return result;
 }
 
+import { VALID_TRANSITIONS } from "./constants";
+
 export async function updateInvoiceStatus(
   id: string,
   status: "draft" | "sent" | "paid" | "overdue" | "void",
@@ -73,6 +75,11 @@ export async function updateInvoiceStatus(
 
   if (!invoice) throw new Error("Factuur niet gevonden");
 
+  const allowed = VALID_TRANSITIONS[invoice.status] ?? [];
+  if (!allowed.includes(status)) {
+    throw new Error(`Kan status niet wijzigen van ${invoice.status} naar ${status}`);
+  }
+
   await assertPeriodNotLocked(invoice.issueDate);
 
   await db
@@ -81,6 +88,64 @@ export async function updateInvoiceStatus(
     .where(eq(invoices.id, id));
 
   revalidatePath("/invoices");
+  revalidatePath(`/invoices/${id}`);
+}
+
+const UpdateInvoiceSchema = z.object({
+  issueDate: z.string(),
+  dueDate: z.string().optional(),
+  notes: z.string().optional(),
+  lines: z.array(InvoiceLineSchema).min(1),
+});
+
+export async function updateInvoice(
+  id: string,
+  input: z.infer<typeof UpdateInvoiceSchema>,
+) {
+  const data = UpdateInvoiceSchema.parse(input);
+
+  await db.transaction(async (tx) => {
+    const [existing] = await tx
+      .select()
+      .from(invoices)
+      .where(eq(invoices.id, id))
+      .limit(1);
+
+    if (!existing) throw new Error("Factuur niet gevonden");
+    if (existing.status !== "draft") {
+      throw new Error("Alleen conceptfacturen kunnen worden bewerkt.");
+    }
+
+    await assertPeriodNotLocked(existing.issueDate);
+    await assertPeriodNotLocked(data.issueDate);
+
+    await tx
+      .update(invoices)
+      .set({
+        issueDate: data.issueDate,
+        dueDate: data.dueDate || null,
+        notes: data.notes || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(invoices.id, id));
+
+    await tx.delete(invoiceLines).where(eq(invoiceLines.invoiceId, id));
+
+    const lineValues = data.lines.map((line, idx) => ({
+      invoiceId: id,
+      description: line.description,
+      quantity: line.quantity.toString(),
+      unitPriceCents: line.unitPriceCents,
+      btwRate: line.btwRate,
+      btwExemptReason: line.btwExemptReason || null,
+      sortOrder: idx,
+    }));
+
+    await tx.insert(invoiceLines).values(lineValues);
+  });
+
+  revalidatePath("/invoices");
+  revalidatePath(`/invoices/${id}`);
 }
 
 export async function deleteInvoice(id: string) {
