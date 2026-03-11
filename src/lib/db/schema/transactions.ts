@@ -9,6 +9,7 @@ import {
   unique,
 } from "drizzle-orm/pg-core";
 import { bankAccounts } from "./bank-accounts";
+import { btwInferenceRules } from "./btw-inference-rules";
 import { contacts } from "./contacts";
 import { invoices } from "./invoices";
 
@@ -38,6 +39,9 @@ export const transactions = pgTable(
     contactId: uuid("contact_id").references(() => contacts.id),
     invoiceId: uuid("invoice_id").references(() => invoices.id),
     btwCode: text("btw_code"),
+    btwCodeSource: text("btw_code_source"),
+    btwCodeSuggested: text("btw_code_suggested"),
+    inferenceRuleId: uuid("inference_rule_id").references(() => btwInferenceRules.id),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (table) => [

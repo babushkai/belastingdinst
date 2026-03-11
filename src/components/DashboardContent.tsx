@@ -3,14 +3,25 @@
 import { useI18n } from "@/lib/i18n";
 import { LinkButton } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { formatCurrency, formatRelativeDate } from "@/lib/format";
+import { formatCurrency, formatRelativeDate, formatDate } from "@/lib/format";
 import type { TranslationKey } from "@/lib/i18n";
+
+interface TaxDeadline {
+  label: string;
+  dueDate: string;
+  type: "btw" | "ib";
+  urgent: boolean;
+  overdue: boolean;
+}
 
 interface DashboardData {
   openCount: number;
   openTotalCents: number;
+  overdueCount: number;
+  overdueTotalCents: number;
   currentBtw: { periodNumber: number; year: number; status: string } | null;
   lastSyncDate: string | null;
+  deadlines: TaxDeadline[];
 }
 
 const btwStatusVariant: Record<string, "default" | "primary" | "success"> = {
@@ -85,6 +96,53 @@ export function DashboardContent({ data }: { data: DashboardData }) {
           </div>
         </div>
       </div>
+
+      {/* Overdue invoices alert */}
+      {data.overdueCount > 0 && (
+        <div className="mt-4 border border-red-700 bg-white p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xs uppercase text-red-700">{t("overdueInvoices")}</h2>
+              <p className="mt-1 text-2xl font-bold text-red-700">
+                {data.overdueCount} — {formatCurrency(data.overdueTotalCents)}
+              </p>
+            </div>
+            <LinkButton href="/invoices" variant="danger" size="sm">
+              {t("view")}
+            </LinkButton>
+          </div>
+        </div>
+      )}
+
+      {/* Tax deadlines */}
+      {data.deadlines.length > 0 && (
+        <div className="mt-6 border border-black bg-white">
+          <h2 className="border-b border-black px-5 py-3 text-xs font-semibold uppercase text-black">
+            {t("taxDeadlines")}
+          </h2>
+          <div className="divide-y divide-gray-300">
+            {data.deadlines.map((d) => (
+              <div key={d.label} className="flex items-center justify-between px-5 py-3">
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`inline-block h-2.5 w-2.5 border ${
+                      d.overdue
+                        ? "border-red-700 bg-red-700"
+                        : d.urgent
+                          ? "border-amber-700 bg-amber-700"
+                          : "border-green-700 bg-green-700"
+                    }`}
+                  />
+                  <span className="text-sm text-black">{d.label}</span>
+                </div>
+                <span className="text-sm font-mono text-gray-600">
+                  {formatDate(d.dueDate)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

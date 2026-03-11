@@ -323,6 +323,13 @@ export const translations = {
     en: "Print summary",
   },
 
+  // ── Auto-categorisation ──
+  suggestionLabel: { nl: "Suggestie", en: "Suggestion" },
+  matchInvoice: { nl: "Koppel factuur", en: "Match invoice" },
+  noMatchFound: { nl: "Geen match gevonden", en: "No match found" },
+  overdueInvoices: { nl: "Achterstallige facturen", en: "Overdue invoices" },
+  taxDeadlines: { nl: "Deadlines", en: "Deadlines" },
+
   // ── Invoice Detail ──
   editInvoice: { nl: "Factuur bewerken", en: "Edit invoice" },
   saveInvoice: { nl: "Factuur opslaan", en: "Save invoice" },

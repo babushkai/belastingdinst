@@ -28,6 +28,7 @@ export default async function EditContactPage({
         email: contact.email ?? "",
         btwNumber: contact.btwNumber ?? "",
         kvkNumber: contact.kvkNumber ?? "",
+        iban: contact.iban ?? "",
         addressStreet: contact.addressStreet ?? "",
         addressPostcode: contact.addressPostcode ?? "",
         addressCity: contact.addressCity ?? "",
