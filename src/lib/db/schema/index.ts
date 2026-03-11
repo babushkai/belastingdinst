@@ -3,6 +3,7 @@ export { settings } from "./settings";
 export { contacts } from "./contacts";
 export { invoices, invoiceLines, invoiceCounters, invoiceStatusEnum } from "./invoices";
 export { bankAccounts } from "./bank-accounts";
+export { btwInferenceRules } from "./btw-inference-rules";
 export { transactions, importSourceEnum } from "./transactions";
 export { btwPeriods, periodTypeEnum, btwPeriodStatusEnum } from "./btw-periods";
 export { syncLog, syncStatusEnum } from "./sync-log";

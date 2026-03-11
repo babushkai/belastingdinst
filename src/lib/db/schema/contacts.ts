@@ -10,6 +10,7 @@ export const contacts = pgTable("contacts", {
   addressStreet: text("address_street"),
   addressCity: text("address_city"),
   addressPostcode: text("address_postcode"),
+  iban: text("iban"),
   addressCountry: text("address_country").notNull().default("NL"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

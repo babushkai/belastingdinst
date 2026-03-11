@@ -13,6 +13,7 @@ interface ContactFormProps {
     email?: string;
     btwNumber?: string;
     kvkNumber?: string;
+    iban?: string;
     addressStreet?: string;
     addressPostcode?: string;
     addressCity?: string;
@@ -53,6 +54,11 @@ export function ContactForm({ title, action, defaults = {} }: ContactFormProps) 
             name="kvkNumber"
             label={t("kvkNumber")}
             defaultValue={defaults.kvkNumber ?? ""}
+          />
+          <Field
+            name="iban"
+            label={t("iban")}
+            defaultValue={defaults.iban ?? ""}
           />
           <Field
             name="addressStreet"

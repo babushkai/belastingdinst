@@ -1,6 +1,7 @@
 "use client";
 
 import { useOptimistic, useTransition } from "react";
+import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { LinkButton } from "@/components/ui/Button";
@@ -15,6 +16,8 @@ interface Transaction {
   description: string | null;
   importSource: string;
   btwCode: string | null;
+  invoiceId: string | null;
+  suggestedBtwCode: string | null;
 }
 
 export function TransactionsContent({
@@ -63,6 +66,7 @@ export function TransactionsContent({
 }
 
 function TransactionRow({ tx }: { tx: Transaction }) {
+  const { t } = useI18n();
   const [isPending, startTransition] = useTransition();
   const [optimisticBtw, setOptimisticBtw] = useOptimistic(tx.btwCode);
 
@@ -74,12 +78,28 @@ function TransactionRow({ tx }: { tx: Transaction }) {
     });
   }
 
+  function applySuggestion() {
+    if (tx.suggestedBtwCode) {
+      handleChange(tx.suggestedBtwCode);
+    }
+  }
+
   return (
     <tr className={`hover:bg-gray-50 ${isPending ? "opacity-60" : ""}`}>
       <td className="whitespace-nowrap px-5 py-3 text-sm text-gray-600">
         {formatDate(tx.valueDate)}
       </td>
-      <td className="max-w-xs truncate px-5 py-3 text-black">{tx.description}</td>
+      <td className="max-w-xs truncate px-5 py-3 text-black">
+        {tx.description}
+        {tx.invoiceId && (
+          <Link
+            href={`/invoices/${tx.invoiceId}`}
+            className="ml-2 text-xs text-[#0000cc]"
+          >
+            [{t("invoiceNumber")}]
+          </Link>
+        )}
+      </td>
       <td className="px-5 py-3 text-black">{tx.counterpartyName ?? "-"}</td>
       <td
         className={`whitespace-nowrap px-5 py-3 text-right font-mono font-medium ${
@@ -89,16 +109,29 @@ function TransactionRow({ tx }: { tx: Transaction }) {
         {formatCurrency(tx.amountCents)}
       </td>
       <td className="px-5 py-3">
-        <select
-          value={optimisticBtw ?? ""}
-          onChange={(e) => handleChange(e.target.value)}
-          className="border border-black px-1.5 py-1 text-xs focus:outline focus:outline-2 focus:outline-[#0000cc]"
-        >
-          <option value="">-</option>
-          <option value="21">21%</option>
-          <option value="9">9%</option>
-          <option value="0">0%</option>
-        </select>
+        <div className="flex items-center gap-1">
+          <select
+            value={optimisticBtw ?? ""}
+            onChange={(e) => handleChange(e.target.value)}
+            className="border border-black px-1.5 py-1 text-xs focus:outline focus:outline-2 focus:outline-[#0000cc]"
+          >
+            <option value="">-</option>
+            <option value="21">21%</option>
+            <option value="9">9%</option>
+            <option value="0">0%</option>
+          </select>
+          {/* Show suggestion badge for uncategorised debit transactions */}
+          {!optimisticBtw && tx.suggestedBtwCode && tx.amountCents < 0 && (
+            <button
+              type="button"
+              onClick={applySuggestion}
+              className="text-xs text-gray-400 hover:text-[#0000cc]"
+              title={`${t("suggestionLabel")}: ${tx.suggestedBtwCode}%`}
+            >
+              {tx.suggestedBtwCode}%?
+            </button>
+          )}
+        </div>
       </td>
       <td className="px-5 py-3 text-xs text-gray-500">{tx.importSource}</td>
     </tr>
