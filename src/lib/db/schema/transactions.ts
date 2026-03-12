@@ -19,7 +19,6 @@ export const importSourceEnum = pgEnum("import_source", [
   "camt053",
   "manual",
   "wise",
-  "gocardless",
 ]);
 
 export const transactions = pgTable(
