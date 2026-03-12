@@ -26,6 +26,7 @@ export default async function BankPage() {
           ? acc.lastSyncedAt.toLocaleDateString("nl-NL")
           : null,
         wiseAccountId: acc.wiseAccountId,
+        gcAccountId: acc.gcAccountId,
       }))}
       recentSyncs={recentSyncs.map((log) => ({
         id: log.id,

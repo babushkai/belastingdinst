@@ -6,7 +6,7 @@ export interface ParsedTransaction {
   counterpartyName?: string;
   counterpartyIban?: string;
   description?: string;
-  importSource: "ponto" | "mt940" | "camt053" | "manual" | "wise";
+  importSource: "ponto" | "mt940" | "camt053" | "manual" | "wise" | "gocardless";
 }
 
 export interface ImportResult {
