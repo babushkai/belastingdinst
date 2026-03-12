@@ -31,11 +31,11 @@ function signOtt(ott: string): string | null {
   return sign.sign(privateKey, "base64");
 }
 
-async function wiseRequest<T>(
+async function wiseFetch(
   apiToken: string,
   path: string,
   params?: Record<string, string>,
-): Promise<T> {
+): Promise<Response> {
   const url = new URL(path, WISE_API_BASE);
   if (params) {
     for (const [key, value] of Object.entries(params)) {
@@ -103,6 +103,15 @@ async function wiseRequest<T>(
     throw new Error(`Wise API ${res.status}: ${body}`);
   }
 
+  return res;
+}
+
+async function wiseRequest<T>(
+  apiToken: string,
+  path: string,
+  params?: Record<string, string>,
+): Promise<T> {
+  const res = await wiseFetch(apiToken, path, params);
   return res.json() as Promise<T>;
 }
 
@@ -139,6 +148,26 @@ export async function getStatement(
       type: "COMPACT",
     },
   );
+}
+
+export async function getStatementMT940(
+  apiToken: string,
+  profileId: number,
+  balanceId: number,
+  currency: string,
+  intervalStart: Date,
+  intervalEnd: Date,
+): Promise<string> {
+  const res = await wiseFetch(
+    apiToken,
+    `/v1/profiles/${profileId}/balance-statements/${balanceId}/statement.mt940`,
+    {
+      currency,
+      intervalStart: intervalStart.toISOString(),
+      intervalEnd: intervalEnd.toISOString(),
+    },
+  );
+  return res.text();
 }
 
 export async function saveWiseConfig(
