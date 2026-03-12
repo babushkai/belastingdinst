@@ -13,6 +13,7 @@ interface BankAccount {
   iban: string;
   lastSyncedAt: string | null;
   wiseAccountId: string | null;
+  gcAccountId: string | null;
 }
 
 interface SyncLogEntry {
@@ -40,6 +41,9 @@ export function BankContent({
   return (
     <div>
       <PageHeader title={t("bank")}>
+        <LinkButton href="/bank/gocardless" className="!bg-black hover:!bg-white hover:!text-black !border !border-black">
+          {t("gcSetup")}
+        </LinkButton>
         <LinkButton href="/bank/wise" className="!bg-black hover:!bg-white hover:!text-black !border !border-black">
           {t("wiseSetup")}
         </LinkButton>
@@ -63,6 +67,7 @@ export function BankContent({
                   </p>
                   <p className="font-mono text-sm text-gray-600">{acc.iban}</p>
                 </div>
+                {acc.gcAccountId && <Badge variant="success">GoCardless</Badge>}
                 {acc.wiseAccountId && <Badge variant="success">Wise</Badge>}
               </div>
               <p className="mt-3 text-xs text-gray-500">
