@@ -161,41 +161,6 @@ export const translations = {
     en: "No sync activity.",
   },
 
-  // ── GoCardless ──
-  gcSetup: { nl: "GoCardless", en: "GoCardless" },
-  gcSetupDescription: {
-    nl: "Koppel je bankrekening via GoCardless Open Banking om automatisch transacties te importeren. Ondersteunt alle Nederlandse banken.",
-    en: "Connect your bank account via GoCardless Open Banking to automatically import transactions. Supports all Dutch banks.",
-  },
-  gcConnect: { nl: "Bank toevoegen", en: "Add bank" },
-  gcConnecting: { nl: "Verbinden...", en: "Connecting..." },
-  gcConnected: { nl: "Gekoppelde rekeningen", en: "Connected accounts" },
-  gcConnectButton: { nl: "Verbinden", en: "Connect" },
-  gcSync: { nl: "Sync", en: "Sync" },
-  gcSyncing: { nl: "Synchroniseren...", en: "Syncing..." },
-  gcDisconnect: { nl: "Ontkoppelen", en: "Disconnect" },
-  gcDisconnectConfirm: {
-    nl: "Weet je zeker dat je deze rekening wilt ontkoppelen?",
-    en: "Are you sure you want to disconnect this account?",
-  },
-  gcSelectBank: { nl: "-- Selecteer bank --", en: "-- Select bank --" },
-  gcLoadBanks: { nl: "Banken laden", en: "Load banks" },
-  gcLoadingBanks: { nl: "Laden...", en: "Loading..." },
-  gcCallbackSuccess: {
-    nl: "Bankrekening succesvol gekoppeld!",
-    en: "Bank account connected successfully!",
-  },
-  gcCallbackError: {
-    nl: "Fout bij koppelen",
-    en: "Connection error",
-  },
-  gcSyncSuccess: { nl: "Sync voltooid", en: "Sync completed" },
-  gcSyncError: { nl: "Sync mislukt", en: "Sync failed" },
-  gcReauthNeeded: {
-    nl: "Autorisatie verloopt binnenkort — koppel opnieuw",
-    en: "Authorization expiring soon — reconnect required",
-  },
-
   // ── Wise ──
   wiseIntegration: { nl: "Wise koppeling", en: "Wise integration" },
   wiseSetup: { nl: "Wise koppelen", en: "Connect Wise" },

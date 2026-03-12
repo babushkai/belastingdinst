@@ -1,32 +1,11 @@
+"use server";
+
 import { db } from "@/lib/db";
 import { bankAccounts, transactions, syncLog } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { getStatement, loadWiseToken } from "./client";
-import type { WiseTransaction } from "./types";
-import type { ParsedTransaction, ImportResult } from "@/lib/bank/types";
-
-function mapWiseTransaction(tx: WiseTransaction): ParsedTransaction {
-  const isDebit = tx.type === "DEBIT";
-  const amountCents = Math.round(tx.amount.value * 100) * (isDebit ? -1 : 1);
-
-  const counterpartyName = isDebit
-    ? tx.details.recipientName
-    : tx.details.senderName;
-
-  const counterpartyIban = isDebit
-    ? tx.details.recipientAccount
-    : tx.details.senderAccount;
-
-  return {
-    externalId: tx.referenceNumber,
-    valueDate: tx.date.slice(0, 10), // YYYY-MM-DD
-    amountCents,
-    counterpartyName: counterpartyName ?? undefined,
-    counterpartyIban: counterpartyIban ?? undefined,
-    description: tx.details.description || tx.details.paymentReference || undefined,
-    importSource: "wise",
-  };
-}
+import { getStatementMT940, loadWiseToken } from "./client";
+import { parseMT940, parseInfo86 } from "@/lib/bank/parsers/mt940";
+import type { ImportResult } from "@/lib/bank/types";
 
 export async function syncWiseAccount(
   bankAccountId: string,
@@ -42,7 +21,6 @@ export async function syncWiseAccount(
     .select({
       wiseProfileId: bankAccounts.wiseProfileId,
       wiseAccountId: bankAccounts.wiseAccountId,
-      iban: bankAccounts.iban,
     })
     .from(bankAccounts)
     .where(eq(bankAccounts.id, bankAccountId))
@@ -63,20 +41,30 @@ export async function syncWiseAccount(
   const errors: string[] = [];
 
   try {
-    // Fetch the EUR currency from IBAN — Wise accounts can hold multi-currency,
-    // but for Dutch business accounting we default to EUR
-    const currency = "EUR";
-
-    const statement = await getStatement(
+    // Download MT940 statement from Wise API
+    const mt940Content = await getStatementMT940(
       apiToken,
       Number(account.wiseProfileId),
       Number(account.wiseAccountId),
-      currency,
+      "EUR",
       intervalStart,
       intervalEnd,
     );
 
-    const parsed = statement.transactions.map(mapWiseTransaction);
+    // Parse through existing MT940 parser
+    const parsed = parseMT940(mt940Content);
+
+    // Enrich with :86: info (same as file-import pipeline)
+    for (const tx of parsed) {
+      if (tx.description) {
+        const info = parseInfo86(tx.description);
+        if (info.counterpartyName) tx.counterpartyName = info.counterpartyName;
+        if (info.counterpartyIban) tx.counterpartyIban = info.counterpartyIban;
+        tx.description = info.description;
+      }
+      // Override import source since this came from Wise API
+      tx.importSource = "wise";
+    }
 
     for (const tx of parsed) {
       try {
@@ -109,7 +97,7 @@ export async function syncWiseAccount(
       }
     }
 
-    // Update bank account lastSyncedAt
+    // Update last synced
     await db
       .update(bankAccounts)
       .set({ lastSyncedAt: new Date() })
@@ -119,7 +107,7 @@ export async function syncWiseAccount(
     errors.push(msg);
   }
 
-  // Update sync log
+  // Update sync log — always runs
   await db
     .update(syncLog)
     .set({
